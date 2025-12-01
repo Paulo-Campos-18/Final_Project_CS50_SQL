@@ -2,7 +2,7 @@
 
 By Paulo Alexandre Mendes Campos
 
-Video overview: <URL HERE>
+Video overview: https://youtu.be/LwcQXwgH05I
 
 ## Scope
 
