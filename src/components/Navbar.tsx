@@ -3,11 +3,13 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/context/CartContext';
+import { useTheme } from '@/context/ThemeContext';
 import UserSelector from './UserSelector';
 
 export default function Navbar() {
   const pathname = usePathname();
   const { cartCount, setIsCartOpen } = useCart();
+  const { theme, toggleTheme } = useTheme();
 
   const links = [
     { href: '/', label: 'Home', icon: '🏠' },
@@ -39,6 +41,14 @@ export default function Navbar() {
         </ul>
 
         <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          <button 
+            onClick={toggleTheme}
+            className="btn btn-outline"
+            style={{ padding: '8px', borderRadius: 'var(--radius-sm)', cursor: 'pointer', background: 'var(--bg-glass)', border: '1px solid var(--border-color)' }}
+            title={theme === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'}
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
+          </button>
           <UserSelector />
           <button 
             className="cart-toggle-btn btn btn-outline" 
