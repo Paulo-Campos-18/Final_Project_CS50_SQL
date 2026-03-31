@@ -16,7 +16,7 @@ export default function ReviewForm({ gameId }: ReviewFormProps) {
   const [msg, setMsg] = useState<{ type: 'success' | 'error', text: string } | null>(null);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('keyvault-user');
+    const savedUser = localStorage.getItem('keyvault-auth');
     if (savedUser) {
       const u = JSON.parse(savedUser);
       setUserId(u.id);

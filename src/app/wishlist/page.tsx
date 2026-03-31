@@ -21,7 +21,7 @@ export default function WishlistPage() {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('keyvault-user');
+    const savedUser = localStorage.getItem('keyvault-auth');
     if (savedUser) {
       const u = JSON.parse(savedUser);
       setUser(u);

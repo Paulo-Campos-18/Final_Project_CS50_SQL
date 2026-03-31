@@ -13,7 +13,7 @@ export default function WishlistToggle({ gameId, className = '' }: WishlistToggl
   const [userId, setUserId] = useState<number | null>(null);
 
   useEffect(() => {
-    const savedUser = localStorage.getItem('keyvault-user');
+    const savedUser = localStorage.getItem('keyvault-auth');
     if (savedUser) {
       const user = JSON.parse(savedUser);
       setUserId(user.id);
@@ -26,7 +26,7 @@ export default function WishlistToggle({ gameId, className = '' }: WishlistToggl
     e.stopPropagation();
 
     if (!userId) {
-      alert('You must select a user from the Navbar before adding to wishlist.');
+      alert('Faça login para adicionar à wishlist.');
       return;
     }
 

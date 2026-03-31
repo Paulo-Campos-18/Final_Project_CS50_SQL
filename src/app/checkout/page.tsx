@@ -23,9 +23,9 @@ export default function CheckoutPage() {
   }, []);
 
   const handleCheckout = async () => {
-    const savedUser = localStorage.getItem('keyvault-user');
+    const savedUser = localStorage.getItem('keyvault-auth');
     if (!savedUser) {
-      setError('You must select a user from the Navbar before checking out.');
+      setError('Faça login antes de finalizar a compra.');
       return;
     }
 
