@@ -9,6 +9,7 @@ CREATE TABLE "users" (
   "email" VARCHAR(100) NOT NULL UNIQUE CHECK("email" LIKE '%@%'),
   "password" TEXT NOT NULL,
   "amount" NUMERIC NOT NULL DEFAULT 0 CHECK("amount" >= 0),
+  "role" TEXT NOT NULL DEFAULT 'user' CHECK("role" IN ('admin', 'user')),
   "created_at" DATETIME DEFAULT CURRENT_TIMESTAMP,
   "deleted" INTEGER NOT NULL DEFAULT 0 CHECK("deleted" IN (0,1)) --1 = deleted
 );
@@ -491,3 +492,15 @@ WHEN (
 BEGIN
     SELECT RAISE(ABORT, 'Cannot sell key for deleted game');
 END;
+
+--Stores friendships between users
+CREATE TABLE "friendships" (
+  "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+  "user_id" INTEGER NOT NULL,
+  "friend_id" INTEGER NOT NULL,
+  "status" TEXT NOT NULL DEFAULT 'pending' CHECK("status" IN ('pending', 'accepted', 'rejected')),
+  "created_at" DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY ("user_id") REFERENCES "users"("id"),
+  FOREIGN KEY ("friend_id") REFERENCES "users"("id"),
+  UNIQUE("user_id", "friend_id")
+);

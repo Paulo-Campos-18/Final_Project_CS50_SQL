@@ -10,6 +10,7 @@ export const users = sqliteTable('users', {
   email: text('email', { length: 100 }).notNull().unique(),
   password: text('password').notNull(),
   amount: real('amount').notNull().default(0),
+  role: text('role').notNull().default('user'),
   createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
   deleted: integer('deleted').notNull().default(0),
 });
@@ -144,4 +145,13 @@ export const transactions = sqliteTable('transactions', {
   status: text('status').notNull().default('Sold'),
   transactionDatetime: text('transaction_datetime').default(sql`CURRENT_TIMESTAMP`),
   totalPrice: real('total_price').notNull(),
+});
+
+// ─── Friendships ─────────────────────────────────────────
+export const friendships = sqliteTable('friendships', {
+  id: integer('id').primaryKey({ autoIncrement: true }),
+  userId: integer('user_id').notNull().references(() => users.id),
+  friendId: integer('friend_id').notNull().references(() => users.id),
+  status: text('status').notNull().default('pending'), // pending, accepted, rejected
+  createdAt: text('created_at').default(sql`CURRENT_TIMESTAMP`),
 });
