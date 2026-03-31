@@ -107,12 +107,12 @@ LEFT JOIN "available_keys_per_game" av ON g."name" = av."name"
 ORDER BY "total_keys" DESC, "sold_count" DESC;
 
 --Inserts
-INSERT INTO users ("first_name","last_name","nickname","email","password")
+INSERT INTO users ("first_name","last_name","nickname","email","password", "amount")
 VALUES
-('Paulo','Campos','paulo_campos','paulo@gmail','abc'),
-('Emylly','Portela','Aiko','emylly@gmail','46554##$$'),
-('Pedro','Henrique','Pedroca','pedro@gmail.com','marcela123'),
-('Marcela','Mafra','little_marcela','marcela@gmail.com','pedro123');
+('Paulo','Campos','paulo_campos','paulo@gmail','abc', 1000),
+('Emylly','Portela','Aiko','emylly@gmail','46554##$$', 1000),
+('Pedro','Henrique','Pedroca','pedro@gmail.com','marcela123', 1000),
+('Marcela','Mafra','little_marcela','marcela@gmail.com','pedro123', 1000);
 
 INSERT INTO genres ("name")
 VALUES
