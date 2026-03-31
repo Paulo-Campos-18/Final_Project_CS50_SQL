@@ -236,7 +236,7 @@ export default async function GameDetailPage({ params }: PageProps) {
             <div className="detail-sidebar">
               {/* Price & Purchase */}
               <div className="detail-info-card">
-                <div className="detail-price-big">${game.price.toFixed(2)}</div>
+                <div className="detail-price-big">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(game.price)}</div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '16px' }}>
                   {availableKeys > 0 ? (
                     <span className="badge badge-success">✓ {availableKeys} keys in stock</span>
@@ -304,9 +304,9 @@ export default async function GameDetailPage({ params }: PageProps) {
                   <h3>📉 Price History</h3>
                   {priceHistory.map((ph, i) => (
                     <div key={i} className="price-history-item">
-                      <span className="price-old">${ph.oldPrice.toFixed(2)}</span>
+                      <span className="price-old">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(ph.oldPrice)}</span>
                       <span className="price-arrow">→</span>
-                      <span className="price-new">${ph.newPrice.toFixed(2)}</span>
+                      <span className="price-new">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(ph.newPrice)}</span>
                     </div>
                   ))}
                 </div>

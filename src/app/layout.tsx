@@ -4,6 +4,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { CartProvider } from '@/context/CartContext';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { AuthProvider } from '@/context/AuthContext';
 import CartDrawer from '@/components/CartDrawer';
 
 export const metadata: Metadata = {
@@ -21,12 +22,14 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <ThemeProvider>
-          <CartProvider>
-            <Navbar />
-            <CartDrawer />
-            <div className="page-wrapper">{children}</div>
-            <Footer />
-          </CartProvider>
+          <AuthProvider>
+            <CartProvider>
+              <Navbar />
+              <CartDrawer />
+              <div className="page-wrapper">{children}</div>
+              <Footer />
+            </CartProvider>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

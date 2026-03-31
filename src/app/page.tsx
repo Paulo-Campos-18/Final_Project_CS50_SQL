@@ -75,33 +75,33 @@ export default async function HomePage() {
       <section className="hero">
         <div className="container">
           <div className="hero-content">
-            <div className="hero-badge">🔑 CS50 SQL Final Project</div>
+            <div className="hero-badge">🔑 Loja Premium de Chaves Digitais</div>
             <h1>
-              Your Digital
+              Seu próximo jogo
               <br />
-              <span className="gradient-text">Game Key Marketplace</span>
+              <span className="gradient-text">está aqui</span>
             </h1>
             <p>
-              Browse, buy, and resell digital game keys across all major platforms.
-              Powered by a robust SQLite database with advanced triggers, views, and optimizations.
+              Compre chaves digitais com os melhores preços do mercado.
+              Catálogo atualizado, entrega imediata e pagamento seguro.
             </p>
 
             <div className="hero-stats">
               <div className="hero-stat animate-fade-in-up stagger-1">
                 <div className="hero-stat-value">{stats.totalGames}</div>
-                <div className="hero-stat-label">Games</div>
+                <div className="hero-stat-label">Jogos</div>
               </div>
               <div className="hero-stat animate-fade-in-up stagger-2">
                 <div className="hero-stat-value">{stats.totalUsers}</div>
-                <div className="hero-stat-label">Users</div>
+                <div className="hero-stat-label">Usuários</div>
               </div>
               <div className="hero-stat animate-fade-in-up stagger-3">
                 <div className="hero-stat-value">{stats.availableKeys}</div>
-                <div className="hero-stat-label">Keys Available</div>
+                <div className="hero-stat-label">Chaves Disponíveis</div>
               </div>
               <div className="hero-stat animate-fade-in-up stagger-4">
-                <div className="hero-stat-value">${stats.totalRevenue.toFixed(0)}</div>
-                <div className="hero-stat-label">Revenue</div>
+                <div className="hero-stat-value">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(stats.totalRevenue)}</div>
+                <div className="hero-stat-label">Em Vendas</div>
               </div>
             </div>
           </div>
@@ -113,8 +113,8 @@ export default async function HomePage() {
         <div className="container">
           <div className="section-header">
             <div>
-              <h2 className="section-title">⭐ Top Rated Games</h2>
-              <p className="section-subtitle">The highest rated games in our store</p>
+              <h2 className="section-title">⭐ Mais Bem Avaliados</h2>
+              <p className="section-subtitle">Os jogos mais bem avaliados da nossa loja</p>
             </div>
             <Link href="/games" className="section-link">
               View All Games →
@@ -149,13 +149,13 @@ export default async function HomePage() {
           </div>
 
           <div className="stats-grid">
-            <StatCard icon="🎮" value={stats.totalGames} label="Total Games" color="purple" />
-            <StatCard icon="👥" value={stats.totalUsers} label="Active Users" color="cyan" />
-            <StatCard icon="🔑" value={stats.availableKeys} label="Keys in Stock" color="amber" />
+            <StatCard icon="🎮" value={stats.totalGames} label="Jogos Cadastrados" color="purple" />
+            <StatCard icon="👥" value={stats.totalUsers} label="Usuários Ativos" color="cyan" />
+            <StatCard icon="🔑" value={stats.availableKeys} label="Chaves em Estoque" color="amber" />
             <StatCard
               icon="💰"
-              value={`$${stats.totalRevenue.toFixed(2)}`}
-              label="Total Revenue"
+              value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.totalRevenue)}
+              label="Receita Total"
               color="green"
             />
           </div>
@@ -166,17 +166,17 @@ export default async function HomePage() {
       <section className="section">
         <div className="container" style={{ textAlign: 'center' }}>
           <h2 className="section-title" style={{ marginBottom: '12px' }}>
-            Explore the Full Database
+            Explore todo o catálogo
           </h2>
           <p className="section-subtitle" style={{ marginBottom: '32px', maxWidth: '500px', margin: '0 auto 32px' }}>
-            Dive into the dashboard to see revenue analytics, supplier data, key inventory, and more.
+            Encontre o jogo perfeito com os melhores preços. Pagamento seguro e entrega imediata.
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-            <Link href="/dashboard" className="btn btn-primary">
-              📊 Open Dashboard
+            <Link href="/games" className="btn btn-primary">
+              🎮 Ver Todos os Jogos
             </Link>
-            <Link href="/games" className="btn btn-outline">
-              🎮 Browse Games
+            <Link href="/wishlist" className="btn btn-outline">
+              ❤️ Minha Wishlist
             </Link>
           </div>
         </div>

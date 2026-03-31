@@ -178,14 +178,14 @@ export default async function DashboardPage() {
             <StatCard icon="🛒" value={data.stats.totalOrders} label="Total Orders" color="amber" />
             <StatCard
               icon="💰"
-              value={`$${data.stats.totalRevenue.toFixed(2)}`}
+              value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(data.stats.totalRevenue)}
               label="Total Revenue"
               color="green"
             />
             <StatCard icon="🔑" value={data.stats.totalKeys} label="Total Keys" color="pink" />
             <StatCard
               icon="📈"
-              value={`$${data.stats.overallProfit.toFixed(2)}`}
+              value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(data.stats.overallProfit)}
               label="Overall Profit"
               color={data.stats.overallProfit >= 0 ? 'green' : 'red'}
             />
@@ -204,19 +204,19 @@ export default async function DashboardPage() {
                       <th>Revenue</th>
                       <th>Cost</th>
                       <th>Profit</th>
-                      <th style={{ textAlign: 'right' }}>Actions</th>
+                      <th style={{ textAlign: 'center' }}>Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {data.profitPerGame.map((g) => (
                       <tr key={g.gameId}>
                         <td>{g.gameName}</td>
-                        <td style={{ color: 'var(--accent-success)' }}>${g.revenue.toFixed(2)}</td>
-                        <td style={{ color: 'var(--accent-danger)' }}>${g.cost.toFixed(2)}</td>
+                        <td style={{ color: 'var(--accent-success)' }}>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(g.revenue)}</td>
+                        <td style={{ color: 'var(--accent-danger)' }}>{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(g.cost)}</td>
                         <td style={{ color: g.profit >= 0 ? 'var(--accent-success)' : 'var(--accent-danger)', fontWeight: 600 }}>
-                          ${g.profit.toFixed(2)}
+                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(g.profit)}
                         </td>
-                        <td style={{ textAlign: 'right' }}>
+                        <td style={{ textAlign: 'center' }}>
                           <Link href={`/dashboard/edit-game/${g.gameId}`} className="btn btn-outline" style={{ padding: '4px 8px', fontSize: '0.8rem' }}>
                             ✏️ Edit
                           </Link>
@@ -234,7 +234,7 @@ export default async function DashboardPage() {
               <div className="bar-chart">
                 {data.mostSold.map((g) => (
                   <div key={g.gameName} className="bar-item">
-                    <span className="bar-label">{g.gameName}</span>
+                    <span className="bar-label" style={{ minWidth: '220px', maxWidth: '220px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block' }}>{g.gameName}</span>
                     <div className="bar-track">
                       <div
                         className="bar-fill"
@@ -278,7 +278,7 @@ export default async function DashboardPage() {
               <div className="bar-chart">
                 {data.keysBySupplier.map((s) => (
                   <div key={s.supplierName} className="bar-item">
-                    <span className="bar-label">{s.supplierName}</span>
+                    <span className="bar-label" style={{ minWidth: '180px', maxWidth: '180px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', display: 'inline-block' }}>{s.supplierName}</span>
                     <div className="bar-track">
                       <div
                         className="bar-fill"

@@ -9,7 +9,7 @@
     "lint": "next lint",
     "db:pull": "drizzle-kit introspect",
     "db:studio": "drizzle-kit studio",
-    "setup:db": "tsx adapters/cli/setup-db.ts"
+    "setup:db": "node scripts/setup-db.js"
   },
   "dependencies": {
     "better-sqlite3": "^12.8.0",

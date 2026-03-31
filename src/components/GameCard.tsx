@@ -44,7 +44,7 @@ export default function GameCard({ id, name, studio, price, platform, rating, ge
         <h3 className="game-card-title">{name}</h3>
         <p className="game-card-studio">{studio}</p>
         <div className="game-card-meta">
-          <span className="game-card-price">${price.toFixed(2)}</span>
+          <span className="game-card-price">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(price)}</span>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {rating != null && (
               <span className="game-card-rating">

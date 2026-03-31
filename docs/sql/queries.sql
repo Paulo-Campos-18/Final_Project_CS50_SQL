@@ -107,12 +107,12 @@ LEFT JOIN "available_keys_per_game" av ON g."name" = av."name"
 ORDER BY "total_keys" DESC, "sold_count" DESC;
 
 --Inserts
-INSERT INTO users ("first_name","last_name","nickname","email","password", "amount")
+INSERT INTO users ("first_name","last_name","nickname","email","password","amount","role")
 VALUES
-('Paulo','Campos','paulo_campos','paulo@gmail','abc', 1000),
-('Emylly','Portela','Aiko','emylly@gmail','46554##$$', 1000),
-('Pedro','Henrique','Pedroca','pedro@gmail.com','marcela123', 1000),
-('Marcela','Mafra','little_marcela','marcela@gmail.com','pedro123', 1000);
+('Paulo','Campos','paulo_campos','paulo@gmail.com','123456', 450.50, 'admin'),
+('Emylly','Portela','Aiko','emylly@gmail.com','123456', 320.00, 'user'),
+('Pedro','Henrique','Pedroca','pedro@gmail.com','123456', 150.75, 'user'),
+('Marcela','Mafra','little_marcela','marcela@gmail.com','123456', 290.00, 'user');
 
 INSERT INTO genres ("name")
 VALUES
@@ -142,19 +142,19 @@ VALUES
 
 INSERT INTO games ("active_platform_id", "name", "studio", "description", "release_date", "price")
 VALUES
-(4, 'The Witcher 3: Wild Hunt', 'CD Projekt Red', 'Open-world RPG following Geralt of Rivia', '2015-05-19', 39.99),
-(4, 'Cyberpunk 2077', 'CD Projekt Red', 'Futuristic open-world RPG', '2020-12-10', 59.99),
-(3, 'God of War', 'Santa Monica Studio', 'Action-adventure following Kratos and Atreus', '2018-04-20', 49.99),
-(4, 'Grand Theft Auto V', 'Rockstar Games', 'Open-world action-adventure game', '2015-04-14', 29.99),
-(4, 'Red Dead Redemption 2', 'Rockstar Games', 'Western action-adventure epic', '2019-11-05', 59.99),
-(3, 'The Last of Us Part II', 'Naughty Dog', 'Post-apocalyptic action-adventure', '2020-06-19', 69.99),
-(2, 'The Legend of Zelda: Breath of the Wild', 'Nintendo', 'Open-world adventure game', '2017-03-03', 59.99),
-(4, 'Elden Ring', 'FromSoftware', 'Open-world action RPG', '2022-02-25', 59.99),
-(4, 'Baldur''s Gate 3', 'Larian Studios', 'Fantasy role-playing game', '2023-08-03', 59.99),
-(4, 'Minecraft', 'Mojang Studios', 'Sandbox survival game', '2011-11-18', 26.95),
-(3, 'Spider-Man: Miles Morales', 'Insomniac Games', 'Superhero action-adventure game', '2020-11-12', 49.99),
-(4, 'Starfield', 'Bethesda', 'Space-themed action RPG', '2023-09-06', 69.99),
-(1, 'Alan Wake 2', 'Remedy Entertainment', 'Survival horror game sequel', '2023-10-27', 59.99);
+(4, 'The Witcher 3: Wild Hunt', 'CD Projekt Red', 'Open-world RPG following Geralt of Rivia', '2015-05-19', 199.90),
+(4, 'Cyberpunk 2077', 'CD Projekt Red', 'Futuristic open-world RPG', '2020-12-10', 299.90),
+(3, 'God of War', 'Santa Monica Studio', 'Action-adventure following Kratos and Atreus', '2018-04-20', 249.90),
+(4, 'Grand Theft Auto V', 'Rockstar Games', 'Open-world action-adventure game', '2015-04-14', 149.90),
+(4, 'Red Dead Redemption 2', 'Rockstar Games', 'Western action-adventure epic', '2019-11-05', 299.90),
+(3, 'The Last of Us Part II', 'Naughty Dog', 'Post-apocalyptic action-adventure', '2020-06-19', 349.90),
+(2, 'The Legend of Zelda: Breath of the Wild', 'Nintendo', 'Open-world adventure game', '2017-03-03', 299.90),
+(4, 'Elden Ring', 'FromSoftware', 'Open-world action RPG', '2022-02-25', 299.90),
+(4, 'Baldur''s Gate 3', 'Larian Studios', 'Fantasy role-playing game', '2023-08-03', 299.90),
+(4, 'Minecraft', 'Mojang Studios', 'Sandbox survival game', '2011-11-18', 134.90),
+(3, 'Spider-Man: Miles Morales', 'Insomniac Games', 'Superhero action-adventure game', '2020-11-12', 249.90),
+(4, 'Starfield', 'Bethesda', 'Space-themed action RPG', '2023-09-06', 349.90),
+(1, 'Alan Wake 2', 'Remedy Entertainment', 'Survival horror game sequel', '2023-10-27', 299.90);
 
 INSERT INTO suppliers ("platform_id", "name", "website", "contact_email")
 VALUES
@@ -194,24 +194,28 @@ VALUES
 
 INSERT INTO key_batches ("game_id", "supplier_id", "unit_price", "quantity", "purchase_date")
 VALUES
-(1, 1, 15.00, 100, '2024-01-15'),
-(2, 1, 25.00, 50, '2024-02-01'),
-(3, 2, 20.00, 75, '2024-01-20'),
-(7, 3, 30.00, 60, '2024-02-10');
+(1, 1, 75.00, 3, '2024-01-15'),
+(2, 1, 110.00, 3, '2024-02-01'),
+(3, 2, 90.00, 3, '2024-01-20'),
+(7, 3, 100.00, 4, '2024-02-10'),
+(4, 1, 55.00, 2, '2024-03-01'),
+(8, 1, 105.00, 2, '2024-03-10'),
+(9, 1, 108.00, 2, '2024-04-01'),
+(5, 1, 112.00, 2, '2024-04-15');
 
 INSERT INTO keys ("game_id", "batch_id", "key_status_id", "key_code")
 VALUES
 (1, 1, 1, 'TW3H-7XK9-B2N4-M8P6'),
 (1, 1, 1, 'TW3H-5R2D-9F7G-1H3J'),
-(1, 1, 2, 'TW3H-8K4L-6Q9W-2E5R'),
+(1, 1, 1, 'TW3H-8K4L-6Q9W-2E5R'),
 (2, 2, 1, 'CP77-3T6Y-8U1I-4O7P'),
 (2, 2, 1, 'CP77-9A2S-5D4F-7G8H'),
 (3, 3, 1, 'GOW4-1J5K-9L2Z-6X8C'),
-(3, 3, 2, 'GOW4-4V7B-3N1M-5Q9W'),
+(3, 3, 1, 'GOW4-4V7B-3N1M-5Q9W'),
 (7, 4, 1, 'ZELDA-2E4R-6T8Y-1U3I'),
 (7, 4, 1, 'ZELDA-5O7P-9A2S-4D6F'),
 (7, 4, 1, 'ZELDA-8G1H-3J5K-7L9Z'),
-(1, 1, 3, 'TW3H-6X8C-4V2B-9N1M'),
+(1, 1, 1, 'TW3H-6X8C-4V2B-9N1M'),
 (2, 2, 1, 'CP77-7Q3W-5E1R-2T4Y');
 
 INSERT INTO orders ("user_id", "purchase_datetime")
@@ -219,7 +223,13 @@ VALUES
 (1, '2024-03-01 14:30:00'),
 (2, '2024-03-02 10:15:00'),
 (3, '2024-03-03 16:45:00'),
-(4, '2024-03-04 20:20:00');
+(4, '2024-03-04 20:20:00'),
+(1, '2024-04-10 09:00:00'),
+(2, '2024-04-11 11:30:00'),
+(3, '2024-05-01 15:00:00'),
+(4, '2024-05-15 18:00:00'),
+(1, '2024-06-05 12:00:00'),
+(2, '2024-06-20 19:30:00');
 
 INSERT INTO payment_method ("name")
 VALUES
@@ -231,17 +241,29 @@ VALUES
 
 INSERT INTO order_keys ("order_id", "key_id", "unit_price")
 VALUES
-(1, 12, 39.99),
-(2, 2, 59.99),
-(3, 8, 59.99),
-(4, 4, 59.99);
+(1, 12, 199.90),
+(2, 2, 299.90),
+(3, 8, 299.90),
+(4, 4, 299.90),
+(5, 5, 299.90),
+(6, 9, 299.90),
+(7, 10, 299.90),
+(8, 11, 249.90),
+(9, 1, 199.90),
+(10, 6, 249.90);
 
 INSERT INTO transactions ("order_id", "payment_method_id", "total_price", "transaction_datetime")
 VALUES
-(1, 1, 39.99, '2024-03-01 14:32:00'),
-(2, 4, 49.99, '2024-03-02 10:18:00'),
-(3, 2, 59.99, '2024-03-03 16:47:00'),
-(4, 3, 59.99, '2024-03-04 20:25:00');
+(1, 1, 199.90, '2024-03-01 14:32:00'),
+(2, 4, 299.90, '2024-03-02 10:18:00'),
+(3, 2, 299.90, '2024-03-03 16:47:00'),
+(4, 3, 299.90, '2024-03-04 20:25:00'),
+(5, 5, 299.90, '2024-04-10 09:05:00'),
+(6, 2, 299.90, '2024-04-11 11:35:00'),
+(7, 5, 299.90, '2024-05-01 15:10:00'),
+(8, 4, 249.90, '2024-05-15 18:05:00'),
+(9, 3, 199.90, '2024-06-05 12:15:00'),
+(10, 2, 249.90, '2024-06-20 19:35:00');
 
 INSERT INTO wishlist ("user_id", "game_id")
 VALUES
@@ -274,7 +296,9 @@ VALUES
 
 INSERT INTO game_price_log ("game_id", "old_price", "new_price")
 VALUES
-(1, 49.99, 39.99),
-(2, 69.99, 59.99),
-(3, 59.99, 49.99),
-(4, 39.99, 29.99);
+(1, 249.90, 199.90),
+(2, 349.90, 299.90),
+(3, 299.90, 249.90),
+(4, 199.90, 149.90),
+(6, 399.90, 349.90),
+(8, 349.90, 299.90);

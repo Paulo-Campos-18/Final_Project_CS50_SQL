@@ -48,41 +48,33 @@ export default function GamesFilter({ games, genres, platforms }: GamesFilterPro
           id="search-games"
         />
 
-        <button
-          className={`filter-chip ${!selectedGenre ? 'active' : ''}`}
-          onClick={() => setSelectedGenre(null)}
+        <select
+          className="search-input"
+          style={{ width: 'auto', minWidth: '180px', cursor: 'pointer' }}
+          value={selectedGenre || ''}
+          onChange={(e) => setSelectedGenre(e.target.value || null)}
         >
-          All Genres
-        </button>
-        {genres.map((genre) => (
-          <button
-            key={genre.id}
-            className={`filter-chip ${selectedGenre === genre.name ? 'active' : ''}`}
-            onClick={() => setSelectedGenre(selectedGenre === genre.name ? null : genre.name)}
-          >
-            {genre.name}
-          </button>
-        ))}
-      </div>
+          <option value="">Todos os Gêneros</option>
+          {genres.map((genre) => (
+            <option key={genre.id} value={genre.name}>
+              {genre.name}
+            </option>
+          ))}
+        </select>
 
-      <div className="filter-bar" style={{ marginTop: '-16px' }}>
-        <button
-          className={`filter-chip ${!selectedPlatform ? 'active' : ''}`}
-          onClick={() => setSelectedPlatform(null)}
+        <select
+          className="search-input"
+          style={{ width: 'auto', minWidth: '180px', cursor: 'pointer' }}
+          value={selectedPlatform || ''}
+          onChange={(e) => setSelectedPlatform(e.target.value || null)}
         >
-          All Platforms
-        </button>
-        {platforms.map((platform) => (
-          <button
-            key={platform.id}
-            className={`filter-chip ${selectedPlatform === platform.name ? 'active' : ''}`}
-            onClick={() =>
-              setSelectedPlatform(selectedPlatform === platform.name ? null : platform.name)
-            }
-          >
-            {platform.name}
-          </button>
-        ))}
+          <option value="">Todas as Plataformas</option>
+          {platforms.map((platform) => (
+            <option key={platform.id} value={platform.name}>
+              {platform.name}
+            </option>
+          ))}
+        </select>
       </div>
 
       {filtered.length > 0 ? (
