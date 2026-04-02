@@ -1,9 +1,10 @@
 import { db } from '@/infra/database/connection';
 import { games, platforms, gameRating, gameGenres, genres } from '@/infra/database/schema';
-import { eq, sql, avg, like } from 'drizzle-orm';
-import GameCard from '@/components/GameCard';
+import { eq, sql, avg } from 'drizzle-orm';
 import type { Metadata } from 'next';
 import GamesFilter from './GamesFilter';
+import { cookies } from 'next/headers';
+import { getDictionary } from '@/i18n';
 
 export const metadata: Metadata = {
   title: 'Games Catalog — KeyVault',
@@ -55,6 +56,9 @@ async function getGames() {
 
 export default async function GamesPage() {
   const data = await getGames();
+  const cookieStore = await cookies();
+  const lang = cookieStore.get('NEXT_LOCALE')?.value || 'pt-BR';
+  const t = getDictionary(lang);
 
   return (
     <main>
@@ -62,8 +66,8 @@ export default async function GamesPage() {
         <div className="container">
           <div className="section-header">
             <div>
-              <h1 className="section-title">🎮 Games Catalog</h1>
-              <p className="section-subtitle">{data.games.length} games available in the store</p>
+              <h1 className="section-title">🎮 {t.gamesCatalogTitle || 'Catálogo de Jogos'}</h1>
+              <p className="section-subtitle">{data.games.length} {t.gamesCatalogSubtitle || 'jogos disponíveis na loja'}</p>
             </div>
           </div>
 

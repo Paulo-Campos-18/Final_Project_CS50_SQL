@@ -5,12 +5,13 @@ import Footer from '@/components/Footer';
 import { CartProvider } from '@/context/CartContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { AuthProvider } from '@/context/AuthContext';
+import { LanguageProvider } from '@/context/LanguageContext';
 import CartDrawer from '@/components/CartDrawer';
 
 export const metadata: Metadata = {
-  title: 'KeyVault — Digital Game Key Store',
+  title: 'KeyVault — Loja de Chaves de Jogos',
   description:
-    'Buy and resell digital game keys. Browse games, track prices, and manage your game collection. CS50 SQL Final Project.',
+    'Compre e revenda chaves digitais de jogos. Explore o catálogo, acompanhe os preços e gerencie sua coleção. CS50 SQL Final Project.',
 };
 
 export default function RootLayout({
@@ -19,17 +20,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <body>
         <ThemeProvider>
-          <AuthProvider>
-            <CartProvider>
+          <LanguageProvider>
+            <AuthProvider>
+              <CartProvider>
               <Navbar />
               <CartDrawer />
               <div className="page-wrapper">{children}</div>
               <Footer />
             </CartProvider>
           </AuthProvider>
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

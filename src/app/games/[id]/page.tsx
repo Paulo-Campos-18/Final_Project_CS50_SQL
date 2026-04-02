@@ -12,6 +12,8 @@ import ReviewForm from '@/components/ReviewForm';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 import GameTabs from './GameTabs';
+import { cookies } from 'next/headers';
+import { getDictionary } from '@/i18n';
 
 // Map game names to emoji icons
 function getGameIcon(name: string): string {
@@ -178,14 +180,20 @@ export default async function GameDetailPage({ params }: PageProps) {
   const { game, avgRating, ratingCount, genres: gameGenreNames, comments, availableKeys, priceHistory, wishlistCount, ratings, relatedGames } = data;
   const icon = getGameIcon(game.name);
 
+  const cookieStore = await cookies();
+  const lang = cookieStore.get('NEXT_LOCALE')?.value || 'pt-BR';
+  const t = getDictionary(lang);
+  
+  const translatedDesc = t.gameDescriptions[game.name] || game.description;
+
   return (
     <main>
       <section className="detail-hero">
         <div className="container">
           <div className="breadcrumb">
-            <Link href="/">Home</Link>
+            <Link href="/">{t.navHome}</Link>
             <span>/</span>
-            <Link href="/games">Games</Link>
+            <Link href="/games">{t.navGames}</Link>
             <span>/</span>
             <span>{game.name}</span>
           </div>
@@ -199,19 +207,19 @@ export default async function GameDetailPage({ params }: PageProps) {
 
               <div>
                 <h1 className="detail-title">{game.name}</h1>
-                <p className="detail-studio">by {game.studio}</p>
+                <p className="detail-studio">{t.gameBy} {game.studio}</p>
               </div>
 
               <div className="game-card-genres" style={{ marginTop: 0 }}>
                 {gameGenreNames.map((g) => (
-                  <span key={g} className="genre-tag">{g}</span>
+                  <span key={g} className="genre-tag">{t.genreMap[g] || g}</span>
                 ))}
               </div>
 
-              {game.description && (
+              {translatedDesc && (
                 <div className="detail-info-card">
-                  <h3>📖 Description</h3>
-                  <p className="detail-description">{game.description}</p>
+                  <h3>{t.gameDescTitle}</h3>
+                  <p className="detail-description">{translatedDesc}</p>
                 </div>
               )}
 
@@ -227,9 +235,9 @@ export default async function GameDetailPage({ params }: PageProps) {
                 <div className="detail-price-big">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(game.price)}</div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '16px' }}>
                   {availableKeys > 0 ? (
-                    <span className="badge badge-success">✓ {availableKeys} chaves disponíveis</span>
+                    <span className="badge badge-success">✓ {availableKeys} {t.gameAvailableKeys}</span>
                   ) : (
-                    <span className="badge badge-danger">✕ Fora de estoque</span>
+                    <span className="badge badge-danger">{t.gameOutOfStock}</span>
                   )}
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <WishlistToggle gameId={game.id} />
@@ -245,25 +253,25 @@ export default async function GameDetailPage({ params }: PageProps) {
 
               {/* Game Info */}
               <div className="detail-info-card">
-                <h3>ℹ️ Detalhes</h3>
+                <h3>{t.gameDetailsTitle}</h3>
                 <div className="detail-info-row">
-                  <span className="label">Plataforma</span>
-                  <span className="value">{game.platform}</span>
+                  <span className="label">{t.gamePlatform}</span>
+                  <span className="value">{t.platformMap[game.platform] || game.platform}</span>
                 </div>
                 <div className="detail-info-row">
-                  <span className="label">Data de Lançamento</span>
+                  <span className="label">{t.gameReleaseDate}</span>
                   <span className="value">{game.releaseDate ?? 'N/A'}</span>
                 </div>
                 {/* Total Keys foi removido daqui */}
                 <div className="detail-info-row">
-                  <span className="label">Na Lista de Desejos</span>
+                  <span className="label">{t.gameInWishlist}</span>
                   <span className="value">{wishlistCount}×</span>
                 </div>
               </div>
 
               {/* Rating */}
               <div className="detail-info-card">
-                <h3>⭐ Notas ({ratingCount})</h3>
+                <h3>{t.gameRatingTitle} ({ratingCount})</h3>
                 {avgRating !== null ? (
                   <>
                     <div style={{ marginBottom: '12px' }}>
@@ -279,14 +287,14 @@ export default async function GameDetailPage({ params }: PageProps) {
                     </div>
                   </>
                 ) : (
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Nenhuma nota ainda.</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{t.gameNoRating}</p>
                 )}
               </div>
 
               {/* Price History */}
               {priceHistory.length > 0 && (
                 <div className="detail-info-card">
-                  <h3>📉 Price History</h3>
+                  <h3>{t.gamePriceHistory}</h3>
                   {priceHistory.map((ph, i) => (
                     <div key={i} className="price-history-item">
                       <span className="price-old">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(ph.oldPrice)}</span>

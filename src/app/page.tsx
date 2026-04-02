@@ -4,6 +4,8 @@ import { games, platforms, gameRating, gameGenres, genres, users, keys, keyStatu
 import { eq, sql, avg, count, and, sum } from 'drizzle-orm';
 import GameCard from '@/components/GameCard';
 import StatCard from '@/components/StatCard';
+import { cookies } from 'next/headers';
+import { getDictionary } from '@/i18n';
 
 async function getHomeData() {
   // Top-rated games with platform info and average rating
@@ -43,30 +45,21 @@ async function getHomeData() {
   // Stats
   const totalGames = db.select({ count: count() }).from(games).where(eq(games.deleted, 0)).get();
   const totalUsers = db.select({ count: count() }).from(users).where(eq(users.deleted, 0)).get();
-  const availableKeys = db
-    .select({ count: count() })
-    .from(keys)
-    .innerJoin(keyStatus, eq(keys.keyStatusId, keyStatus.id))
-    .where(eq(keyStatus.status, 'Available'))
-    .get();
-  const totalRevenue = db
-    .select({ total: sum(transactions.totalPrice) })
-    .from(transactions)
-    .where(eq(transactions.status, 'Sold'))
-    .get();
 
   return {
     topGames: gamesWithGenres,
     stats: {
       totalGames: totalGames?.count ?? 0,
       totalUsers: totalUsers?.count ?? 0,
-      availableKeys: availableKeys?.count ?? 0,
-      totalRevenue: totalRevenue?.total ? Number(totalRevenue.total) : 0,
     },
   };
 }
 
 export default async function HomePage() {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get('NEXT_LOCALE')?.value || 'pt-BR';
+  const t = getDictionary(lang);
+
   const { topGames, stats } = await getHomeData();
 
   return (
@@ -75,33 +68,24 @@ export default async function HomePage() {
       <section className="hero">
         <div className="container">
           <div className="hero-content">
-            <div className="hero-badge">🔑 Loja Premium de Chaves Digitais</div>
+            <div className="hero-badge">{t.homeHeroBadge}</div>
             <h1>
-              Seu próximo jogo
+              {t.homeHeroTitle1}
               <br />
-              <span className="gradient-text">está aqui</span>
+              <span className="gradient-text">{t.homeHeroTitle2}</span>
             </h1>
             <p>
-              Compre chaves digitais com os melhores preços do mercado.
-              Catálogo atualizado, entrega imediata e pagamento seguro.
+              {t.homeHeroDesc}
             </p>
 
             <div className="hero-stats">
               <div className="hero-stat animate-fade-in-up stagger-1">
                 <div className="hero-stat-value">{stats.totalGames}</div>
-                <div className="hero-stat-label">Jogos</div>
+                <div className="hero-stat-label">{t.homeStatGames}</div>
               </div>
               <div className="hero-stat animate-fade-in-up stagger-2">
                 <div className="hero-stat-value">{stats.totalUsers}</div>
-                <div className="hero-stat-label">Usuários</div>
-              </div>
-              <div className="hero-stat animate-fade-in-up stagger-3">
-                <div className="hero-stat-value">{stats.availableKeys}</div>
-                <div className="hero-stat-label">Chaves Disponíveis</div>
-              </div>
-              <div className="hero-stat animate-fade-in-up stagger-4">
-                <div className="hero-stat-value">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(stats.totalRevenue)}</div>
-                <div className="hero-stat-label">Em Vendas</div>
+                <div className="hero-stat-label">{t.homeStatUsers}</div>
               </div>
             </div>
           </div>
@@ -113,11 +97,11 @@ export default async function HomePage() {
         <div className="container">
           <div className="section-header">
             <div>
-              <h2 className="section-title">⭐ Mais Bem Avaliados</h2>
-              <p className="section-subtitle">Os jogos mais bem avaliados da nossa loja</p>
+              <h2 className="section-title">{t.homeTopGamesTitle}</h2>
+              <p className="section-subtitle">{t.homeTopGamesDesc}</p>
             </div>
             <Link href="/games" className="section-link">
-              View All Games →
+              {t.homeViewAll}
             </Link>
           </div>
 
@@ -144,17 +128,17 @@ export default async function HomePage() {
       <section className="section">
         <div className="container" style={{ textAlign: 'center' }}>
           <h2 className="section-title" style={{ marginBottom: '12px' }}>
-            Explore todo o catálogo
+            {t.homeCTATitle}
           </h2>
           <p className="section-subtitle" style={{ marginBottom: '32px', maxWidth: '500px', margin: '0 auto 32px' }}>
-            Encontre o jogo perfeito com os melhores preços. Pagamento seguro e entrega imediata.
+            {t.homeCTADesc}
           </p>
           <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
             <Link href="/games" className="btn btn-primary">
-              🎮 Ver Todos os Jogos
+              {t.homeCTABtnGames}
             </Link>
             <Link href="/wishlist" className="btn btn-outline">
-              ❤️ Minha Wishlist
+              {t.homeCTABtnWishlist}
             </Link>
           </div>
         </div>

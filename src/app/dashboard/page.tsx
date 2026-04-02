@@ -8,6 +8,8 @@ import { eq, sql, count, sum, avg, and } from 'drizzle-orm';
 import StatCard from '@/components/StatCard';
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { cookies } from 'next/headers';
+import { getDictionary } from '@/i18n';
 
 export const metadata: Metadata = {
   title: 'Dashboard — KeyVault',
@@ -148,6 +150,10 @@ async function getDashboardData() {
 }
 
 export default async function DashboardPage() {
+  const cookieStore = await cookies();
+  const lang = cookieStore.get('NEXT_LOCALE')?.value || 'pt-BR';
+  const t = getDictionary(lang);
+
   const data = await getDashboardData();
   const maxSold = data.mostSold.length > 0 ? Math.max(...data.mostSold.map((g) => g.soldCount)) : 1;
   const maxKeys = data.keysBySupplier.length > 0 ? Math.max(...data.keysBySupplier.map((s) => s.totalKeys)) : 1;
@@ -158,35 +164,35 @@ export default async function DashboardPage() {
         <div className="container">
           <div className="section-header">
             <div>
-              <h1 className="section-title">📊 Dashboard</h1>
-              <p className="section-subtitle">Business analytics and store performance metrics</p>
+              <h1 className="section-title">{t.dashTitle}</h1>
+              <p className="section-subtitle">{t.dashSubtitle}</p>
             </div>
             <div style={{ display: 'flex', gap: '12px' }}>
               <Link href="/dashboard/add-game" className="btn btn-primary" style={{ padding: '8px 16px', fontSize: '0.9rem' }}>
-                ➕ Add Game
+                {t.dashAddGame}
               </Link>
               <Link href="/dashboard/restock" className="btn btn-outline" style={{ padding: '8px 16px', fontSize: '0.9rem' }}>
-                📦 Restock
+                {t.dashRestock}
               </Link>
             </div>
           </div>
 
           {/* Top Stats */}
           <div className="stats-grid" style={{ marginBottom: '32px' }}>
-            <StatCard icon="🎮" value={data.stats.totalGames} label="Total Games" color="purple" />
-            <StatCard icon="👥" value={data.stats.totalUsers} label="Active Users" color="cyan" />
-            <StatCard icon="🛒" value={data.stats.totalOrders} label="Total Orders" color="amber" />
+            <StatCard icon="🎮" value={data.stats.totalGames} label={t.dashStatTotalGames} color="purple" />
+            <StatCard icon="👥" value={data.stats.totalUsers} label={t.dashStatActiveUsers} color="cyan" />
+            <StatCard icon="🛒" value={data.stats.totalOrders} label={t.dashStatTotalOrders} color="amber" />
             <StatCard
               icon="💰"
               value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(data.stats.totalRevenue)}
-              label="Total Revenue"
+              label={t.dashStatTotalRevenue}
               color="green"
             />
-            <StatCard icon="🔑" value={data.stats.totalKeys} label="Total Keys" color="pink" />
+            <StatCard icon="🔑" value={data.stats.totalKeys} label={t.dashStatTotalKeys} color="pink" />
             <StatCard
               icon="📈"
               value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(data.stats.overallProfit)}
-              label="Overall Profit"
+              label={t.dashStatOverallProfit}
               color={data.stats.overallProfit >= 0 ? 'green' : 'red'}
             />
           </div>
@@ -195,16 +201,16 @@ export default async function DashboardPage() {
           <div className="dashboard-grid">
             {/* Profit per Game */}
             <div className="dashboard-card">
-              <h3>💵 Profit Per Game</h3>
+              <h3>{t.dashProfitPerGame}</h3>
               <div className="data-table-wrapper">
                 <table className="data-table">
                   <thead>
                     <tr>
-                      <th>Game</th>
-                      <th>Revenue</th>
-                      <th>Cost</th>
-                      <th>Profit</th>
-                      <th style={{ textAlign: 'center' }}>Actions</th>
+                      <th>{t.dashColGame}</th>
+                      <th>{t.dashColRevenue}</th>
+                      <th>{t.dashColCost}</th>
+                      <th>{t.dashColProfit}</th>
+                      <th style={{ textAlign: 'center' }}>{t.dashColActions}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -218,7 +224,7 @@ export default async function DashboardPage() {
                         </td>
                         <td style={{ textAlign: 'center' }}>
                           <Link href={`/dashboard/edit-game/${g.gameId}`} className="btn btn-outline" style={{ padding: '4px 8px', fontSize: '0.8rem' }}>
-                            ✏️ Edit
+                            {t.dashBtnEdit}
                           </Link>
                         </td>
                       </tr>
@@ -230,7 +236,7 @@ export default async function DashboardPage() {
 
             {/* Most Sold Games */}
             <div className="dashboard-card">
-              <h3>🏆 Most Sold Games</h3>
+              <h3>{t.dashMostSold}</h3>
               <div className="bar-chart">
                 {data.mostSold.map((g) => (
                   <div key={g.gameName} className="bar-item">
@@ -250,7 +256,7 @@ export default async function DashboardPage() {
 
             {/* Keys Per Status */}
             <div className="dashboard-card">
-              <h3>🔑 Key Inventory</h3>
+              <h3>{t.dashKeyInventory}</h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
                 {data.keysPerStatus.map((ks) => {
                   let badgeClass = 'badge-info';
@@ -274,7 +280,7 @@ export default async function DashboardPage() {
 
             {/* Suppliers */}
             <div className="dashboard-card">
-              <h3>📦 Keys by Supplier</h3>
+              <h3>{t.dashKeysBySupplier}</h3>
               <div className="bar-chart">
                 {data.keysBySupplier.map((s) => (
                   <div key={s.supplierName} className="bar-item">
@@ -297,13 +303,13 @@ export default async function DashboardPage() {
 
             {/* Payment Methods */}
             <div className="dashboard-card">
-              <h3>💳 Payment Methods</h3>
+              <h3>{t.dashPaymentMethods}</h3>
               <div className="data-table-wrapper">
                 <table className="data-table">
                   <thead>
                     <tr>
-                      <th>Method</th>
-                      <th>Transactions</th>
+                      <th>{t.dashColMethod}</th>
+                      <th>{t.dashColTransactions}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -322,14 +328,14 @@ export default async function DashboardPage() {
 
             {/* Top Rated */}
             <div className="dashboard-card">
-              <h3>⭐ Top Rated Games</h3>
+              <h3>{t.dashTopRated}</h3>
               <div className="data-table-wrapper">
                 <table className="data-table">
                   <thead>
                     <tr>
-                      <th>Game</th>
-                      <th>Avg Rating</th>
-                      <th>Reviews</th>
+                      <th>{t.dashColGame}</th>
+                      <th>{t.dashColAvgRating}</th>
+                      <th>{t.dashColReviews}</th>
                     </tr>
                   </thead>
                   <tbody>

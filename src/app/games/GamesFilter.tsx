@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import GameCard from '@/components/GameCard';
+import { useLanguage } from '@/context/LanguageContext';
 
 interface Game {
   id: number;
@@ -20,6 +21,7 @@ interface GamesFilterProps {
 }
 
 export default function GamesFilter({ games, genres, platforms }: GamesFilterProps) {
+  const { t, dict } = useLanguage();
   const [search, setSearch] = useState('');
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
@@ -42,7 +44,7 @@ export default function GamesFilter({ games, genres, platforms }: GamesFilterPro
         <input
           type="text"
           className="search-input"
-          placeholder="🔍 Search games or studios..."
+          placeholder={t('filterSearch')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           id="search-games"
@@ -54,10 +56,10 @@ export default function GamesFilter({ games, genres, platforms }: GamesFilterPro
           value={selectedGenre || ''}
           onChange={(e) => setSelectedGenre(e.target.value || null)}
         >
-          <option value="">Todos os Gêneros</option>
+          <option value="">{t('filterAllGenres')}</option>
           {genres.map((genre) => (
             <option key={genre.id} value={genre.name}>
-              {genre.name}
+              {dict.genreMap[genre.name] || genre.name}
             </option>
           ))}
         </select>
@@ -68,10 +70,10 @@ export default function GamesFilter({ games, genres, platforms }: GamesFilterPro
           value={selectedPlatform || ''}
           onChange={(e) => setSelectedPlatform(e.target.value || null)}
         >
-          <option value="">Todas as Plataformas</option>
+          <option value="">{t('filterAllPlatforms')}</option>
           {platforms.map((platform) => (
             <option key={platform.id} value={platform.name}>
-              {platform.name}
+              {dict.platformMap[platform.name] || platform.name}
             </option>
           ))}
         </select>
@@ -95,7 +97,7 @@ export default function GamesFilter({ games, genres, platforms }: GamesFilterPro
       ) : (
         <div className="empty-state">
           <div className="empty-state-icon">🔍</div>
-          <p>No games found matching your filters.</p>
+          <p>{t('filterNoGames')}</p>
         </div>
       )}
     </>

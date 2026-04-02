@@ -2,6 +2,7 @@
 
 import AdminGuard from '@/components/AdminGuard';
 import { useEffect, useState } from 'react';
+import { useLanguage } from '@/context/LanguageContext';
 
 type AdminData = {
   games: { id: number; name: string }[];
@@ -12,15 +13,6 @@ type AdminData = {
 };
 
 type TabId = 'addGame' | 'createUser' | 'viewUsers' | 'addSupplier' | 'addGenre' | 'editGameGenres';
-
-const tabs: { id: TabId; label: string; icon: string }[] = [
-  { id: 'viewUsers', label: 'Ver Usuários', icon: '👥' },
-  { id: 'addGame', label: 'Adicionar Jogo', icon: '🎮' },
-  { id: 'createUser', label: 'Criar Usuário', icon: '👤' },
-  { id: 'addSupplier', label: 'Adicionar Fornecedor', icon: '📦' },
-  { id: 'addGenre', label: 'Adicionar Categoria', icon: '🏷️' },
-  { id: 'editGameGenres', label: 'Editar Categorias', icon: '✏️' },
-];
 
 const inputStyle: React.CSSProperties = {
   width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-sm)',
@@ -34,11 +26,21 @@ const labelStyle: React.CSSProperties = {
 };
 
 export default function AdminPage() {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState<TabId>('addGame');
   const [data, setData] = useState<AdminData | null>(null);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  const tabs: { id: TabId; label: string; icon: string }[] = [
+    { id: 'viewUsers', label: t('adminTabUsers'), icon: '👥' },
+    { id: 'addGame', label: t('adminTabAddGame'), icon: '🎮' },
+    { id: 'createUser', label: t('adminTabCreateUser'), icon: '👤' },
+    { id: 'addSupplier', label: t('adminTabAddSupplier'), icon: '📦' },
+    { id: 'addGenre', label: t('adminTabAddGenre'), icon: '🏷️' },
+    { id: 'editGameGenres', label: t('adminTabEditGenres'), icon: '✏️' },
+  ];
 
   // Form states
   const [gameName, setGameName] = useState('');
@@ -111,8 +113,8 @@ export default function AdminPage() {
       <main className="container" style={{ paddingTop: '80px' }}>
         <div className="section-header">
           <div>
-            <h1 className="section-title">⚙️ Painel Administrativo</h1>
-            <p className="section-subtitle">Gerencie jogos, usuários, fornecedores e categorias</p>
+            <h1 className="section-title">{t('adminTitle')}</h1>
+            <p className="section-subtitle">{t('adminSubtitle')}</p>
           </div>
         </div>
 
@@ -142,20 +144,20 @@ export default function AdminPage() {
           {/* Add Game */}
           {activeTab === 'addGame' && (
             <form onSubmit={(e) => { e.preventDefault(); adminAction('addGame', { name: gameName, studio: gameStudio, description: gameDesc, price: gamePrice, platformId: gamePlatform, genreIds: gameGenreIds }); }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <h3>🎮 Adicionar Novo Jogo</h3>
-              <div><label style={labelStyle}>Nome</label><input style={inputStyle} value={gameName} onChange={(e) => setGameName(e.target.value)} required /></div>
-              <div><label style={labelStyle}>Estúdio</label><input style={inputStyle} value={gameStudio} onChange={(e) => setGameStudio(e.target.value)} required /></div>
-              <div><label style={labelStyle}>Descrição</label><textarea style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }} value={gameDesc} onChange={(e) => setGameDesc(e.target.value)} /></div>
-              <div><label style={labelStyle}>Preço (R$)</label><input type="number" step="0.01" style={inputStyle} value={gamePrice} onChange={(e) => setGamePrice(e.target.value)} required /></div>
+              <h3>{t('adminSectAddGame')}</h3>
+              <div><label style={labelStyle}>{t('adminLabelName')}</label><input style={inputStyle} value={gameName} onChange={(e) => setGameName(e.target.value)} required /></div>
+              <div><label style={labelStyle}>{t('adminLabelStudio')}</label><input style={inputStyle} value={gameStudio} onChange={(e) => setGameStudio(e.target.value)} required /></div>
+              <div><label style={labelStyle}>{t('adminLabelDesc')}</label><textarea style={{ ...inputStyle, minHeight: '80px', resize: 'vertical' }} value={gameDesc} onChange={(e) => setGameDesc(e.target.value)} /></div>
+              <div><label style={labelStyle}>{t('adminLabelPrice')} (R$)</label><input type="number" step="0.01" style={inputStyle} value={gamePrice} onChange={(e) => setGamePrice(e.target.value)} required /></div>
               <div>
-                <label style={labelStyle}>Plataforma</label>
+                <label style={labelStyle}>{t('adminLabelPlatform')}</label>
                 <select style={inputStyle} value={gamePlatform} onChange={(e) => setGamePlatform(e.target.value)} required>
-                  <option value="">Selecione...</option>
+                  <option value="">{t('adminSelect')}</option>
                   {data?.platforms.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
                 </select>
               </div>
               <div>
-                <label style={labelStyle}>Gêneros</label>
+                <label style={labelStyle}>{t('adminLabelGenres')}</label>
                 <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                   {data?.genres.map((g) => (
                     <button key={g.id} type="button" onClick={() => handleGameGenreToggle(g.id)} style={{ padding: '6px 12px', borderRadius: '99px', border: '1px solid var(--border-color)', background: gameGenreIds.includes(g.id) ? 'var(--accent-primary)' : 'var(--bg-tertiary)', color: gameGenreIds.includes(g.id) ? 'white' : 'var(--text-primary)', cursor: 'pointer', fontSize: '0.82rem', transition: 'all 0.2s' }}>
@@ -165,7 +167,7 @@ export default function AdminPage() {
                 </div>
               </div>
               <button type="submit" disabled={loading} className="btn btn-primary" style={{ padding: '12px', opacity: loading ? 0.7 : 1 }}>
-                {loading ? 'Adicionando...' : 'Adicionar Jogo'}
+                {loading ? t('adminBtnAdding') : t('adminBtnAddGame')}
               </button>
             </form>
           )}
@@ -173,23 +175,23 @@ export default function AdminPage() {
           {/* Create User */}
           {activeTab === 'createUser' && (
             <form onSubmit={(e) => { e.preventDefault(); adminAction('createUser', { firstName: userFirstName, lastName: userLastName, nickname: userNickname, email: userEmail, password: userPassword, role: userRole }); }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <h3>👤 Criar Novo Usuário</h3>
+              <h3>{t('adminSectCreateUser')}</h3>
               <div style={{ display: 'flex', gap: '12px' }}>
-                <div style={{ flex: 1 }}><label style={labelStyle}>Nome</label><input style={inputStyle} value={userFirstName} onChange={(e) => setUserFirstName(e.target.value)} required /></div>
-                <div style={{ flex: 1 }}><label style={labelStyle}>Sobrenome</label><input style={inputStyle} value={userLastName} onChange={(e) => setUserLastName(e.target.value)} required /></div>
+                <div style={{ flex: 1 }}><label style={labelStyle}>{t('adminLabelName')}</label><input style={inputStyle} value={userFirstName} onChange={(e) => setUserFirstName(e.target.value)} required /></div>
+                <div style={{ flex: 1 }}><label style={labelStyle}>{t('adminLabelLastName')}</label><input style={inputStyle} value={userLastName} onChange={(e) => setUserLastName(e.target.value)} required /></div>
               </div>
-              <div><label style={labelStyle}>Apelido</label><input style={inputStyle} value={userNickname} onChange={(e) => setUserNickname(e.target.value)} required /></div>
-              <div><label style={labelStyle}>E-mail</label><input type="email" style={inputStyle} value={userEmail} onChange={(e) => setUserEmail(e.target.value)} required /></div>
-              <div><label style={labelStyle}>Senha</label><input type="password" style={inputStyle} value={userPassword} onChange={(e) => setUserPassword(e.target.value)} required /></div>
+              <div><label style={labelStyle}>{t('adminLabelNickname')}</label><input style={inputStyle} value={userNickname} onChange={(e) => setUserNickname(e.target.value)} required /></div>
+              <div><label style={labelStyle}>{t('adminLabelEmail')}</label><input type="email" style={inputStyle} value={userEmail} onChange={(e) => setUserEmail(e.target.value)} required /></div>
+              <div><label style={labelStyle}>{t('adminLabelPassword')}</label><input type="password" style={inputStyle} value={userPassword} onChange={(e) => setUserPassword(e.target.value)} required /></div>
               <div>
-                <label style={labelStyle}>Papel</label>
+                <label style={labelStyle}>{t('adminLabelRole')}</label>
                 <select style={inputStyle} value={userRole} onChange={(e) => setUserRole(e.target.value)}>
-                  <option value="user">Usuário</option>
-                  <option value="admin">Administrador</option>
+                  <option value="user">{t('adminRoleUser')}</option>
+                  <option value="admin">{t('adminRoleAdmin')}</option>
                 </select>
               </div>
               <button type="submit" disabled={loading} className="btn btn-primary" style={{ padding: '12px', opacity: loading ? 0.7 : 1 }}>
-                {loading ? 'Criando...' : 'Criar Usuário'}
+                {loading ? t('adminBtnCreating') : t('adminBtnCreateUser')}
               </button>
             </form>
           )}
@@ -197,25 +199,25 @@ export default function AdminPage() {
           {/* View / Manage Users */}
           {activeTab === 'viewUsers' && (
             <div>
-              <h3 style={{ marginBottom: '16px' }}>📋 Lista de Usuários</h3>
+              <h3 style={{ marginBottom: '16px' }}>{t('adminSectViewUsers')}</h3>
               
               <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
                 <input 
                   type="text" 
-                  placeholder="Pesquisar por nome, apelido, email..." 
+                  placeholder={t('adminSearchUserPlaceholder')}
                   style={{ ...inputStyle, flex: '1 1 200px' }}
                   value={filterText}
                   onChange={(e) => setFilterText(e.target.value)}
                 />
                 <select style={{ ...inputStyle, flex: '0 0 auto', width: 'auto' }} value={filterRole} onChange={(e) => setFilterRole(e.target.value)}>
-                  <option value="all">Todos os Papéis</option>
-                  <option value="user">Usuários Comuns</option>
-                  <option value="admin">Administradores</option>
+                  <option value="all">{t('adminFilterAllRoles')}</option>
+                  <option value="user">{t('adminFilterNormalUsers')}</option>
+                  <option value="admin">{t('adminFilterAdmins')}</option>
                 </select>
                 <select style={{ ...inputStyle, flex: '0 0 auto', width: 'auto' }} value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
-                  <option value="all">Todos os Status</option>
-                  <option value="active">Ativos</option>
-                  <option value="deleted">Excluídos (Soft)</option>
+                  <option value="all">{t('adminFilterAllStatus')}</option>
+                  <option value="active">{t('adminFilterActive')}</option>
+                  <option value="deleted">{t('adminFilterDeleted')}</option>
                 </select>
               </div>
 
@@ -223,12 +225,12 @@ export default function AdminPage() {
                 <table className="data-table" style={{ width: '100%', minWidth: '800px' }}>
                   <thead>
                     <tr>
-                      <th>Nome / Apelido</th>
-                      <th>Email</th>
-                      <th>Papel</th>
-                      <th>Saldo</th>
-                      <th>Status</th>
-                      <th>Ações</th>
+                      <th>{t('adminColNameNick')}</th>
+                      <th>{t('adminColEmail')}</th>
+                      <th>{t('adminColRole')}</th>
+                      <th>{t('adminColBalance')}</th>
+                      <th>{t('adminColStatus')}</th>
+                      <th>{t('adminColActions')}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -247,24 +249,24 @@ export default function AdminPage() {
                         <td style={{ color: 'var(--text-secondary)' }}>{u.email}</td>
                         <td>
                           {u.role === 'admin' 
-                            ? <span className="badge badge-info" style={{ padding: '2px 8px' }}>Admin</span>
-                            : <span className="badge badge-secondary" style={{ padding: '2px 8px' }}>Usuário</span>}
+                            ? <span className="badge badge-info" style={{ padding: '2px 8px' }}>{t('adminBadgeAdmin')}</span>
+                            : <span className="badge badge-secondary" style={{ padding: '2px 8px' }}>{t('adminBadgeUser')}</span>}
                         </td>
                         <td style={{ color: 'var(--accent-success)', fontWeight: 600 }}>
                           {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(u.amount)}
                         </td>
                         <td>
                           {u.deleted === 0
-                            ? <span className="badge badge-success" style={{ padding: '2px 8px' }}>Ativo</span>
-                            : <span className="badge badge-danger" style={{ padding: '2px 8px' }}>Excluído</span>}
+                            ? <span className="badge badge-success" style={{ padding: '2px 8px' }}>{t('adminBadgeActive')}</span>
+                            : <span className="badge badge-danger" style={{ padding: '2px 8px' }}>{t('adminBadgeDeleted')}</span>}
                         </td>
                         <td>
                           {u.deleted === 0 && (
                             <button
-                              onClick={() => { if (confirm(`Tem certeza que deseja excluir ${u.firstName}?`)) adminAction('deleteUser', { userId: u.id }); }}
+                              onClick={() => { if (confirm(`${t('adminConfirmDelete')} ${u.firstName}?`)) adminAction('deleteUser', { userId: u.id }); }}
                               className="btn btn-outline" style={{ padding: '4px 10px', fontSize: '0.75rem', color: '#f87171', borderColor: '#f87171' }}
                             >
-                              Excluir
+                              {t('adminBtnDelete')}
                             </button>
                           )}
                         </td>
@@ -279,19 +281,19 @@ export default function AdminPage() {
           {/* Add Supplier */}
           {activeTab === 'addSupplier' && (
             <form onSubmit={(e) => { e.preventDefault(); adminAction('addSupplier', { name: supplierName, website: supplierWebsite, contactEmail: supplierEmail, platformId: supplierPlatform }); }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <h3>📦 Adicionar Fornecedor</h3>
-              <div><label style={labelStyle}>Nome</label><input style={inputStyle} value={supplierName} onChange={(e) => setSupplierName(e.target.value)} required /></div>
-              <div><label style={labelStyle}>Website</label><input type="url" style={inputStyle} value={supplierWebsite} onChange={(e) => setSupplierWebsite(e.target.value)} required /></div>
-              <div><label style={labelStyle}>E-mail de Contato</label><input type="email" style={inputStyle} value={supplierEmail} onChange={(e) => setSupplierEmail(e.target.value)} required /></div>
+              <h3>{t('adminSectAddSupplier')}</h3>
+              <div><label style={labelStyle}>{t('adminLabelName')}</label><input style={inputStyle} value={supplierName} onChange={(e) => setSupplierName(e.target.value)} required /></div>
+              <div><label style={labelStyle}>{t('adminLabelWebsite')}</label><input type="url" style={inputStyle} value={supplierWebsite} onChange={(e) => setSupplierWebsite(e.target.value)} required /></div>
+              <div><label style={labelStyle}>{t('adminLabelContactEmail')}</label><input type="email" style={inputStyle} value={supplierEmail} onChange={(e) => setSupplierEmail(e.target.value)} required /></div>
               <div>
-                <label style={labelStyle}>Plataforma</label>
+                <label style={labelStyle}>{t('adminLabelPlatform')}</label>
                 <select style={inputStyle} value={supplierPlatform} onChange={(e) => setSupplierPlatform(e.target.value)} required>
-                  <option value="">Selecione...</option>
+                  <option value="">{t('adminSelect')}</option>
                   {data?.platforms.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
                 </select>
               </div>
               <button type="submit" disabled={loading} className="btn btn-primary" style={{ padding: '12px', opacity: loading ? 0.7 : 1 }}>
-                {loading ? 'Adicionando...' : 'Adicionar Fornecedor'}
+                {loading ? t('adminBtnAdding') : t('adminBtnAddSupplier')}
               </button>
             </form>
           )}
@@ -299,14 +301,14 @@ export default function AdminPage() {
           {/* Add Genre */}
           {activeTab === 'addGenre' && (
             <form onSubmit={(e) => { e.preventDefault(); adminAction('addGenre', { name: genreName }); setGenreName(''); }} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <h3>🏷️ Adicionar Categoria</h3>
-              <div><label style={labelStyle}>Nome da Categoria</label><input style={inputStyle} value={genreName} onChange={(e) => setGenreName(e.target.value)} required /></div>
+              <h3>{t('adminSectAddGenre')}</h3>
+              <div><label style={labelStyle}>{t('adminLabelGenreName')}</label><input style={inputStyle} value={genreName} onChange={(e) => setGenreName(e.target.value)} required /></div>
               <button type="submit" disabled={loading} className="btn btn-primary" style={{ padding: '12px', opacity: loading ? 0.7 : 1 }}>
-                {loading ? 'Adicionando...' : 'Adicionar'}
+                {loading ? t('adminBtnAdding') : t('adminBtnAdd')}
               </button>
               {data && data.genres.length > 0 && (
                 <div style={{ marginTop: '16px' }}>
-                  <h4 style={{ marginBottom: '12px', color: 'var(--text-muted)' }}>Categorias Existentes:</h4>
+                  <h4 style={{ marginBottom: '12px', color: 'var(--text-muted)' }}>{t('adminExistingGenres')}</h4>
                   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                     {data.genres.map((g) => (
                       <span key={g.id} className="genre-tag">{g.name}</span>
@@ -320,18 +322,18 @@ export default function AdminPage() {
           {/* Edit Game Genres */}
           {activeTab === 'editGameGenres' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <h3>✏️ Editar Categorias de um Jogo</h3>
+              <h3>{t('adminSectEditGenres')}</h3>
               <div>
-                <label style={labelStyle}>Selecione o Jogo</label>
+                <label style={labelStyle}>{t('adminLabelSelectGame')}</label>
                 <select style={inputStyle} value={selectedGameId} onChange={(e) => setSelectedGameId(e.target.value)}>
-                  <option value="">Selecione...</option>
+                  <option value="">{t('adminSelect')}</option>
                   {data?.games.map((g) => <option key={g.id} value={g.id}>{g.name}</option>)}
                 </select>
               </div>
               {selectedGameId && (
                 <>
                   <div>
-                    <label style={labelStyle}>Categorias</label>
+                    <label style={labelStyle}>{t('adminLabelGenres')}</label>
                     <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                       {data?.genres.map((g) => (
                         <button key={g.id} type="button" onClick={() => handleSelectedGenreToggle(g.id)} style={{ padding: '6px 14px', borderRadius: '99px', border: '1px solid var(--border-color)', background: selectedGenreIds.includes(g.id) ? 'var(--accent-primary)' : 'var(--bg-tertiary)', color: selectedGenreIds.includes(g.id) ? 'white' : 'var(--text-primary)', cursor: 'pointer', fontSize: '0.82rem', transition: 'all 0.2s' }}>
@@ -344,7 +346,7 @@ export default function AdminPage() {
                     onClick={() => adminAction('updateGameGenres', { gameId: selectedGameId, genreIds: selectedGenreIds })}
                     disabled={loading} className="btn btn-primary" style={{ padding: '12px', opacity: loading ? 0.7 : 1 }}
                   >
-                    {loading ? 'Salvando...' : 'Salvar Categorias'}
+                    {loading ? t('adminBtnSaving') : t('adminBtnSaveGenres')}
                   </button>
                 </>
               )}

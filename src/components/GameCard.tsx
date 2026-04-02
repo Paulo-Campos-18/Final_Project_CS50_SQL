@@ -1,6 +1,9 @@
+'use client';
+
 import Link from 'next/link';
 import AddToCartButton from './AddToCartButton';
 import WishlistToggle from './WishlistToggle';
+import { useLanguage } from '@/context/LanguageContext';
 interface GameCardProps {
   id: number;
   name: string;
@@ -33,12 +36,13 @@ function getGameIcon(name: string): string {
 
 export default function GameCard({ id, name, studio, price, platform, rating, genres }: GameCardProps) {
   const icon = getGameIcon(name);
+  const { dict } = useLanguage();
 
   return (
     <Link href={`/games/${id}`} className="game-card" id={`game-card-${id}`}>
       <div className="game-card-image">
         <span className="game-card-icon">{icon}</span>
-        <span className="game-card-platform">{platform}</span>
+        <span className="game-card-platform">{dict.platformMap[platform] || platform}</span>
       </div>
       <div className="game-card-body">
         <h3 className="game-card-title">{name}</h3>
@@ -58,7 +62,7 @@ export default function GameCard({ id, name, studio, price, platform, rating, ge
         {genres && genres.length > 0 && (
           <div className="game-card-genres">
             {genres.map((g) => (
-              <span key={g} className="genre-tag">{g}</span>
+              <span key={g} className="genre-tag">{dict.genreMap[g] || g}</span>
             ))}
           </div>
         )}

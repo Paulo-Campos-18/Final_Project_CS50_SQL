@@ -6,6 +6,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useCart } from '@/context/CartContext';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -13,6 +14,7 @@ export default function Navbar() {
   const { cartCount, setIsCartOpen } = useCart();
   const { theme, toggleTheme } = useTheme();
   const { user, login, register, updateUser, logout } = useAuth();
+  const { language, t, toggleLanguage } = useLanguage();
 
   // Modal state
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -124,14 +126,14 @@ export default function Navbar() {
   };
 
   const publicLinks = [
-    { href: '/', label: 'Home' },
-    { href: '/games', label: 'Jogos' },
-    { href: '/wishlist', label: 'Wishlist' },
+    { href: '/', label: t('navHome') },
+    { href: '/games', label: t('navGames') },
+    { href: '/wishlist', label: t('navWishlist') },
   ];
 
   const adminLinks = [
-    { href: '/dashboard', label: 'Dashboard' },
-    { href: '/admin', label: 'Gerenciar' },
+    { href: '/dashboard', label: t('navDashboard') },
+    { href: '/admin', label: t('navManage') },
   ];
 
   const links = [
@@ -174,10 +176,18 @@ export default function Navbar() {
 
           <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button
+              onClick={toggleLanguage}
+              className="btn btn-outline"
+              style={{ padding: '8px', borderRadius: 'var(--radius-sm)', background: 'var(--bg-glass)', border: '1px solid var(--border-color)', fontSize: '1rem', width: '40px', display: 'flex', justifyContent: 'center' }}
+              title={t('langToggle')}
+            >
+              {language === 'pt-BR' ? '🇧🇷' : '🇺🇸'}
+            </button>
+            <button
               onClick={toggleTheme}
               className="btn btn-outline"
-              style={{ padding: '8px', borderRadius: 'var(--radius-sm)', background: 'var(--bg-glass)', border: '1px solid var(--border-color)' }}
-              title={theme === 'dark' ? 'Tema claro' : 'Tema escuro'}
+              style={{ padding: '8px', borderRadius: 'var(--radius-sm)', background: 'var(--bg-glass)', border: '1px solid var(--border-color)', width: '40px', display: 'flex', justifyContent: 'center' }}
+              title={theme === 'dark' ? t('themeLight') : t('themeDark')}
             >
               {theme === 'dark' ? '☀️' : '🌙'}
             </button>
@@ -223,9 +233,9 @@ export default function Navbar() {
                     overflow: 'hidden', zIndex: 1500, padding: '6px 0',
                   }}>
                     {[
-                      { label: '👤 Meu Perfil', href: '/profile' },
-                      { label: '🔑 Minhas Chaves', href: '/my-keys' },
-                      { label: '👥 Amigos', href: '/friends' },
+                      { label: `👤 ${t('myProfile')}`, href: '/profile' },
+                      { label: `🔑 ${t('myKeys')}`, href: '/my-keys' },
+                      { label: `👥 ${t('friends')}`, href: '/friends' },
                     ].map((item) => (
                       <Link
                         key={item.href}
@@ -253,27 +263,33 @@ export default function Navbar() {
                       onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-tertiary)')}
                       onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                     >
-                      ✏️ Editar Perfil
+                      ✏️ {t('editProfile')}
                     </button>
                     <div style={{ height: '1px', background: 'var(--border-color)', margin: '4px 0' }} />
                     <button
                       onClick={handleLogout}
                       style={{
-                        display: 'block', width: '100%', padding: '10px 16px', fontSize: '0.88rem',
+                        width: '100%', padding: '10px 16px', fontSize: '0.88rem',
                         color: '#f87171', background: 'transparent', border: 'none',
                         textAlign: 'left', cursor: 'pointer', transition: 'background 0.15s',
+                        display: 'flex', alignItems: 'center', gap: '8px'
                       }}
                       onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(239,68,68,0.1)')}
                       onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                     >
-                      🚪 Sair
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                        <polyline points="16 17 21 12 16 7"></polyline>
+                        <line x1="21" y1="12" x2="9" y2="12"></line>
+                      </svg>
+                      {t('logout')}
                     </button>
                   </div>
                 )}
               </div>
             ) : (
               <button onClick={() => { setAuthMode('login'); setShowAuthModal(true); }} className="btn btn-primary" style={{ padding: '8px 18px' }}>
-                Entrar
+                {t('login')}
               </button>
             )}
 
@@ -317,10 +333,10 @@ export default function Navbar() {
             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
               <div style={{ fontSize: '2.5rem', marginBottom: '10px' }}>🔑</div>
               <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.5rem', fontWeight: '700', marginBottom: '6px' }}>
-                {authMode === 'login' ? 'Entrar na KeyVault' : 'Criar sua conta'}
+                {authMode === 'login' ? t('loginTitle') : t('registerTitle')}
               </h2>
               <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-                {authMode === 'login' ? 'Use seu e-mail e senha para continuar' : 'Preencha seus dados para criar sua conta'}
+                {authMode === 'login' ? t('loginSubtitle') : t('registerSubtitle')}
               </p>
             </div>
 
@@ -335,7 +351,7 @@ export default function Navbar() {
                   transition: 'all 0.2s',
                 }}
               >
-                Entrar
+                {t('login')}
               </button>
               <button
                 onClick={() => { setAuthMode('register'); setLoginError(''); setRegError(''); }}
@@ -346,18 +362,18 @@ export default function Navbar() {
                   transition: 'all 0.2s',
                 }}
               >
-                Criar Conta
+                {t('register')}
               </button>
             </div>
 
             {authMode === 'login' ? (
               <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 <div>
-                  <label style={labelStyle}>E-mail</label>
+                  <label style={labelStyle}>{t('email')}</label>
                   <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="seu@email.com" required style={inputStyle} />
                 </div>
                 <div>
-                  <label style={labelStyle}>Senha</label>
+                  <label style={labelStyle}>{t('password')}</label>
                   <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••" required style={inputStyle} />
                 </div>
                 {loginError && (
@@ -366,34 +382,34 @@ export default function Navbar() {
                   </div>
                 )}
                 <button type="submit" disabled={isLoggingIn} className="btn btn-primary" style={{ width: '100%', padding: '12px', fontSize: '0.95rem', opacity: isLoggingIn ? 0.7 : 1 }}>
-                  {isLoggingIn ? 'Entrando...' : 'Entrar'}
+                  {isLoggingIn ? t('loggingIn') : t('loginAction')}
                 </button>
                 <p style={{ textAlign: 'center', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                  Conta de teste: <strong>paulo@gmail.com</strong> / <strong>123456</strong>
+                  {t('testAccount')}: <strong>paulo@gmail.com</strong> / <strong>123456</strong>
                 </p>
               </form>
             ) : (
               <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
                 <div style={{ display: 'flex', gap: '12px' }}>
                   <div style={{ flex: 1 }}>
-                    <label style={labelStyle}>Nome</label>
+                    <label style={labelStyle}>{t('firstName')}</label>
                     <input type="text" value={regFirstName} onChange={(e) => setRegFirstName(e.target.value)} placeholder="João" required style={inputStyle} />
                   </div>
                   <div style={{ flex: 1 }}>
-                    <label style={labelStyle}>Sobrenome</label>
+                    <label style={labelStyle}>{t('lastName')}</label>
                     <input type="text" value={regLastName} onChange={(e) => setRegLastName(e.target.value)} placeholder="Silva" required style={inputStyle} />
                   </div>
                 </div>
                 <div>
-                  <label style={labelStyle}>Apelido</label>
+                  <label style={labelStyle}>{t('nickname')}</label>
                   <input type="text" value={regNickname} onChange={(e) => setRegNickname(e.target.value)} placeholder="joao_silva" required style={inputStyle} />
                 </div>
                 <div>
-                  <label style={labelStyle}>E-mail</label>
+                  <label style={labelStyle}>{t('email')}</label>
                   <input type="email" value={regEmail} onChange={(e) => setRegEmail(e.target.value)} placeholder="joao@email.com" required style={inputStyle} />
                 </div>
                 <div>
-                  <label style={labelStyle}>Senha</label>
+                  <label style={labelStyle}>{t('password')}</label>
                   <input type="password" value={regPassword} onChange={(e) => setRegPassword(e.target.value)} placeholder="••••••" required style={inputStyle} minLength={4} />
                 </div>
                 {regError && (
@@ -402,7 +418,7 @@ export default function Navbar() {
                   </div>
                 )}
                 <button type="submit" disabled={isRegistering} className="btn btn-primary" style={{ width: '100%', padding: '12px', fontSize: '0.95rem', opacity: isRegistering ? 0.7 : 1 }}>
-                  {isRegistering ? 'Criando...' : 'Criar Conta'}
+                  {isRegistering ? t('registering') : t('registerAction')}
                 </button>
               </form>
             )}
@@ -426,19 +442,19 @@ export default function Navbar() {
             boxShadow: 'var(--shadow-lg)',
           }}>
             <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.3rem', fontWeight: '700', marginBottom: '24px', textAlign: 'center' }}>
-              ✏️ Editar Perfil
+              ✏️ {t('editProfile')}
             </h2>
             <form onSubmit={handleEditProfile} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
-                <label style={labelStyle}>Nome</label>
+                <label style={labelStyle}>{t('firstName')}</label>
                 <input type="text" value={editFirstName} onChange={(e) => setEditFirstName(e.target.value)} style={inputStyle} />
               </div>
               <div>
-                <label style={labelStyle}>Sobrenome</label>
+                <label style={labelStyle}>{t('lastName')}</label>
                 <input type="text" value={editLastName} onChange={(e) => setEditLastName(e.target.value)} style={inputStyle} />
               </div>
               <div>
-                <label style={labelStyle}>Apelido</label>
+                <label style={labelStyle}>{t('nickname')}</label>
                 <input type="text" value={editNickname} onChange={(e) => setEditNickname(e.target.value)} style={inputStyle} />
               </div>
               {editError && (
@@ -448,10 +464,10 @@ export default function Navbar() {
               )}
               <div style={{ display: 'flex', gap: '12px' }}>
                 <button type="button" onClick={() => setShowEditModal(false)} className="btn btn-outline" style={{ flex: 1, padding: '10px' }}>
-                  Cancelar
+                  {t('cancel')}
                 </button>
                 <button type="submit" disabled={isSavingProfile} className="btn btn-primary" style={{ flex: 1, padding: '10px', opacity: isSavingProfile ? 0.7 : 1 }}>
-                  {isSavingProfile ? 'Salvando...' : 'Salvar'}
+                  {isSavingProfile ? t('saving') : t('save')}
                 </button>
               </div>
             </form>
