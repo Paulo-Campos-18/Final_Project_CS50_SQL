@@ -70,7 +70,8 @@
 
   --text-primary: #12121a;
   --text-secondary: #4a4a58;
-  --text-muted: #6a6a82;
+  --text-muted: #8e8ea0;
+  --bg-glass: rgba(0, 0, 0, 0.04);
 
   --border-color: rgba(0, 0, 0, 0.08);
   --navbar-bg: rgba(255, 255, 255, 0.85);
@@ -455,7 +456,7 @@ button {
   top: 12px;
   right: 12px;
   padding: 4px 10px;
-  background: rgba(0, 0, 0, 0.6);
+  background: var(--bg-glass);
   backdrop-filter: blur(10px);
   border-radius: var(--radius-sm);
   font-size: 0.72rem;
@@ -483,6 +484,8 @@ button {
   font-size: 0.8rem;
   color: var(--text-muted);
   margin-bottom: 12px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
 }
 
 .game-card-meta {
