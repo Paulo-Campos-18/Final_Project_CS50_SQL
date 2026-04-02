@@ -94,7 +94,7 @@ export async function GET() {
   const allPlatforms = db.select({ id: platforms.id, name: platforms.name }).from(platforms).all();
   const allUsers = db.select({
     id: users.id, firstName: users.firstName, lastName: users.lastName,
-    nickname: users.nickname, email: users.email, deleted: users.deleted, role: users.role,
+    nickname: users.nickname, email: users.email, deleted: users.deleted, role: users.role, amount: users.amount,
   }).from(users).all();
 
   // Get genres for each game

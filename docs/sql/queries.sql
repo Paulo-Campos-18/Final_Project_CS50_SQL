@@ -154,7 +154,12 @@ VALUES
 (4, 'Minecraft', 'Mojang Studios', 'Sandbox survival game', '2011-11-18', 134.90),
 (3, 'Spider-Man: Miles Morales', 'Insomniac Games', 'Superhero action-adventure game', '2020-11-12', 249.90),
 (4, 'Starfield', 'Bethesda', 'Space-themed action RPG', '2023-09-06', 349.90),
-(1, 'Alan Wake 2', 'Remedy Entertainment', 'Survival horror game sequel', '2023-10-27', 299.90);
+(1, 'Alan Wake 2', 'Remedy Entertainment', 'Survival horror game sequel', '2023-10-27', 299.90),
+(4, 'Stardew Valley', 'ConcernedApe', 'Farming simulation role-playing game', '2016-02-26', 24.99),
+(4, 'Hollow Knight', 'Team Cherry', 'Metroidvania action-adventure', '2017-02-24', 46.99),
+(4, 'Hades', 'Supergiant Games', 'Rogue-like action dungeon crawler', '2020-09-17', 73.99),
+(4, 'Terraria', 'Re-Logic', 'Action-adventure sandbox game', '2011-05-16', 19.99),
+(4, 'Sekiro: Shadows Die Twice', 'FromSoftware', 'Action-adventure game', '2019-03-22', 199.90);
 
 INSERT INTO suppliers ("platform_id", "name", "website", "contact_email")
 VALUES
@@ -190,7 +195,17 @@ VALUES
 -- Starfield (RPG, Action, Adventure)
 (12, 3), (12, 1), (12, 2),
 -- Alan Wake 2 (Horror, Action)
-(13, 4), (13, 1);
+(13, 4), (13, 1),
+-- Stardew Valley (Simulation, RPG)
+(14, 5), (14, 2),
+-- Hollow Knight (Action, Adventure)
+(15, 1), (15, 2),
+-- Hades (Action, RPG)
+(16, 1), (16, 2),
+-- Terraria (Adventure, RPG)
+(17, 2), (17, 3),
+-- Sekiro (Action, Adventure)
+(18, 1), (18, 2);
 
 INSERT INTO key_batches ("game_id", "supplier_id", "unit_price", "quantity", "purchase_date")
 VALUES
@@ -201,7 +216,12 @@ VALUES
 (4, 1, 55.00, 2, '2024-03-01'),
 (8, 1, 105.00, 2, '2024-03-10'),
 (9, 1, 108.00, 2, '2024-04-01'),
-(5, 1, 112.00, 2, '2024-04-15');
+(5, 1, 112.00, 2, '2024-04-15'),
+(14, 1, 10.00, 2, '2024-04-16'),
+(15, 1, 20.00, 2, '2024-04-16'),
+(16, 1, 30.00, 2, '2024-04-16'),
+(17, 1, 8.00, 2, '2024-04-16'),
+(18, 1, 100.00, 2, '2024-04-16');
 
 INSERT INTO keys ("game_id", "batch_id", "key_status_id", "key_code")
 VALUES
@@ -216,7 +236,17 @@ VALUES
 (7, 4, 1, 'ZELDA-5O7P-9A2S-4D6F'),
 (7, 4, 1, 'ZELDA-8G1H-3J5K-7L9Z'),
 (1, 1, 1, 'TW3H-6X8C-4V2B-9N1M'),
-(2, 2, 1, 'CP77-7Q3W-5E1R-2T4Y');
+(2, 2, 1, 'CP77-7Q3W-5E1R-2T4Y'),
+(14, 9, 1, 'SDV-X1Y2-Z3W4-V5U6'),
+(14, 9, 1, 'SDV-M7N8-B9V0-C1X2'),
+(15, 10, 1, 'HK-A1B2-C3D4-E5F6'),
+(15, 10, 1, 'HK-G7H8-I9J0-K1L2'),
+(16, 11, 1, 'HADES-Q1W2-E3R4-T5Y6'),
+(16, 11, 1, 'HADES-U7I8-O9P0-A1S2'),
+(17, 12, 1, 'TRRA-Z1X2-C3V4-B5N6'),
+(17, 12, 1, 'TRRA-M7L8-K9J0-H1G2'),
+(18, 13, 1, 'SEKI-F1D2-S3A4-P5O6'),
+(18, 13, 1, 'SEKI-I7U8-Y9T0-R1E2');
 
 INSERT INTO orders ("user_id", "purchase_datetime")
 VALUES

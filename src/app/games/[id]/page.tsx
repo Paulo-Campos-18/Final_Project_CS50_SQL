@@ -11,6 +11,7 @@ import WishlistToggle from '@/components/WishlistToggle';
 import ReviewForm from '@/components/ReviewForm';
 import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
+import GameTabs from './GameTabs';
 
 // Map game names to emoji icons
 function getGameIcon(name: string): string {
@@ -102,13 +103,6 @@ async function getGameDetail(id: number) {
     .where(and(eq(keys.gameId, id), eq(keyStatus.status, 'Available')))
     .get();
 
-  // Total keys
-  const totalKeysCount = db
-    .select({ count: count() })
-    .from(keys)
-    .where(eq(keys.gameId, id))
-    .get();
-
   // Price history
   const priceHistory = db
     .select({
@@ -139,6 +133,26 @@ async function getGameDetail(id: number) {
     .where(eq(gameRating.gameId, id))
     .all();
 
+  const relatedGames = db
+    .select({
+      id: games.id,
+      name: games.name,
+      studio: games.studio,
+      price: games.price,
+    })
+    .from(games)
+    .innerJoin(gameGenres, eq(games.id, gameGenres.gameId))
+    .where(
+      and(
+        eq(games.deleted, 0),
+        sql`${games.id} != ${id}`,
+        sql`${gameGenres.genreId} IN (SELECT genre_id FROM game_genres WHERE game_id = ${id})`
+      )
+    )
+    .groupBy(games.id)
+    .limit(5)
+    .all();
+
   return {
     game,
     avgRating: ratingData?.avg ? Number(ratingData.avg) : null,
@@ -146,10 +160,10 @@ async function getGameDetail(id: number) {
     genres: gameGenresList.map((g) => g.name),
     comments,
     availableKeys: availableKeysCount?.count ?? 0,
-    totalKeys: totalKeysCount?.count ?? 0,
     priceHistory,
     wishlistCount: wishlistCount?.count ?? 0,
     ratings,
+    relatedGames,
   };
 }
 
@@ -161,7 +175,7 @@ export default async function GameDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const { game, avgRating, ratingCount, genres: gameGenreNames, comments, availableKeys, totalKeys, priceHistory, wishlistCount, ratings } = data;
+  const { game, avgRating, ratingCount, genres: gameGenreNames, comments, availableKeys, priceHistory, wishlistCount, ratings, relatedGames } = data;
   const icon = getGameIcon(game.name);
 
   return (
@@ -201,35 +215,9 @@ export default async function GameDetailPage({ params }: PageProps) {
                 </div>
               )}
 
-              {/* Comments */}
-              <div className="detail-info-card">
-                <h3>💬 Reviews ({comments.length})</h3>
-                {comments.length > 0 ? (
-                  <div className="comment-list">
-                    {comments.map((comment) => (
-                      <div key={comment.id} className="comment-card">
-                        <div className="comment-header">
-                          <div className="comment-avatar">
-                            {comment.firstName[0]}{comment.lastName[0]}
-                          </div>
-                          <span className="comment-author">{comment.nickname}</span>
-                          {comment.createdAt && (
-                            <span className="comment-date">{comment.createdAt}</span>
-                          )}
-                        </div>
-                        <p className="comment-text">{comment.text}</p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="empty-state" style={{ padding: '24px' }}>
-                    <p>No reviews yet.</p>
-                  </div>
-                )}
-              </div>
+              {/* Removed old Comments section, now using GameTabs at the bottom of main */}
 
-              {/* Review Form */}
-              <ReviewForm gameId={game.id} />
+              <GameTabs comments={comments} relatedGames={relatedGames} />
             </div>
 
             {/* Sidebar */}
@@ -239,9 +227,9 @@ export default async function GameDetailPage({ params }: PageProps) {
                 <div className="detail-price-big">{new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(game.price)}</div>
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '16px' }}>
                   {availableKeys > 0 ? (
-                    <span className="badge badge-success">✓ {availableKeys} keys in stock</span>
+                    <span className="badge badge-success">✓ {availableKeys} chaves disponíveis</span>
                   ) : (
-                    <span className="badge badge-danger">✕ Out of stock</span>
+                    <span className="badge badge-danger">✕ Fora de estoque</span>
                   )}
                   <div style={{ display: 'flex', gap: '8px' }}>
                     <WishlistToggle gameId={game.id} />
@@ -257,28 +245,25 @@ export default async function GameDetailPage({ params }: PageProps) {
 
               {/* Game Info */}
               <div className="detail-info-card">
-                <h3>ℹ️ Game Details</h3>
+                <h3>ℹ️ Detalhes</h3>
                 <div className="detail-info-row">
-                  <span className="label">Platform</span>
+                  <span className="label">Plataforma</span>
                   <span className="value">{game.platform}</span>
                 </div>
                 <div className="detail-info-row">
-                  <span className="label">Release Date</span>
+                  <span className="label">Data de Lançamento</span>
                   <span className="value">{game.releaseDate ?? 'N/A'}</span>
                 </div>
+                {/* Total Keys foi removido daqui */}
                 <div className="detail-info-row">
-                  <span className="label">Total Keys</span>
-                  <span className="value">{totalKeys}</span>
-                </div>
-                <div className="detail-info-row">
-                  <span className="label">Wishlisted</span>
+                  <span className="label">Na Lista de Desejos</span>
                   <span className="value">{wishlistCount}×</span>
                 </div>
               </div>
 
               {/* Rating */}
               <div className="detail-info-card">
-                <h3>⭐ Ratings ({ratingCount})</h3>
+                <h3>⭐ Notas ({ratingCount})</h3>
                 {avgRating !== null ? (
                   <>
                     <div style={{ marginBottom: '12px' }}>
@@ -294,7 +279,7 @@ export default async function GameDetailPage({ params }: PageProps) {
                     </div>
                   </>
                 ) : (
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>No ratings yet.</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Nenhuma nota ainda.</p>
                 )}
               </div>
 

@@ -7,16 +7,16 @@ type AdminData = {
   games: { id: number; name: string }[];
   genres: { id: number; name: string }[];
   platforms: { id: number; name: string }[];
-  users: { id: number; firstName: string; lastName: string; nickname: string; email: string; deleted: number; role: string }[];
+  users: { id: number; firstName: string; lastName: string; nickname: string; email: string; deleted: number; role: string; amount: number }[];
   gameGenresMap: Record<number, number[]>;
 };
 
-type TabId = 'addGame' | 'createUser' | 'deleteUser' | 'addSupplier' | 'addGenre' | 'editGameGenres';
+type TabId = 'addGame' | 'createUser' | 'viewUsers' | 'addSupplier' | 'addGenre' | 'editGameGenres';
 
 const tabs: { id: TabId; label: string; icon: string }[] = [
+  { id: 'viewUsers', label: 'Ver Usuários', icon: '👥' },
   { id: 'addGame', label: 'Adicionar Jogo', icon: '🎮' },
   { id: 'createUser', label: 'Criar Usuário', icon: '👤' },
-  { id: 'deleteUser', label: 'Excluir Usuário', icon: '🗑️' },
   { id: 'addSupplier', label: 'Adicionar Fornecedor', icon: '📦' },
   { id: 'addGenre', label: 'Adicionar Categoria', icon: '🏷️' },
   { id: 'editGameGenres', label: 'Editar Categorias', icon: '✏️' },
@@ -64,6 +64,10 @@ export default function AdminPage() {
 
   const [selectedGameId, setSelectedGameId] = useState('');
   const [selectedGenreIds, setSelectedGenreIds] = useState<number[]>([]);
+
+  const [filterText, setFilterText] = useState('');
+  const [filterRole, setFilterRole] = useState('all');
+  const [filterStatus, setFilterStatus] = useState('all');
 
   const fetchData = async () => {
     const res = await fetch('/api/admin');
@@ -190,29 +194,84 @@ export default function AdminPage() {
             </form>
           )}
 
-          {/* Delete User */}
-          {activeTab === 'deleteUser' && (
+          {/* View / Manage Users */}
+          {activeTab === 'viewUsers' && (
             <div>
-              <h3 style={{ marginBottom: '16px' }}>🗑️ Excluir Usuários</h3>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {data?.users.filter((u) => u.deleted === 0).map((u) => (
-                  <div key={u.id} style={{
-                    display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 16px',
-                    background: 'var(--bg-tertiary)', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border-color)',
-                  }}>
-                    <div>
-                      <span style={{ fontWeight: 600 }}>{u.firstName} {u.lastName}</span>
-                      <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginLeft: '8px' }}>@{u.nickname}</span>
-                      {u.role === 'admin' && <span style={{ marginLeft: '6px', fontSize: '0.65rem', background: 'rgba(139,92,246,0.2)', color: 'var(--accent-primary-light)', padding: '1px 6px', borderRadius: '99px' }}>admin</span>}
-                    </div>
-                    <button
-                      onClick={() => { if (confirm(`Tem certeza que deseja excluir ${u.firstName}?`)) adminAction('deleteUser', { userId: u.id }); }}
-                      className="btn btn-outline" style={{ padding: '6px 14px', fontSize: '0.82rem', color: '#f87171', borderColor: '#f87171' }}
-                    >
-                      Excluir
-                    </button>
-                  </div>
-                ))}
+              <h3 style={{ marginBottom: '16px' }}>📋 Lista de Usuários</h3>
+              
+              <div style={{ display: 'flex', gap: '12px', marginBottom: '24px', flexWrap: 'wrap' }}>
+                <input 
+                  type="text" 
+                  placeholder="Pesquisar por nome, apelido, email..." 
+                  style={{ ...inputStyle, flex: '1 1 200px' }}
+                  value={filterText}
+                  onChange={(e) => setFilterText(e.target.value)}
+                />
+                <select style={{ ...inputStyle, flex: '0 0 auto', width: 'auto' }} value={filterRole} onChange={(e) => setFilterRole(e.target.value)}>
+                  <option value="all">Todos os Papéis</option>
+                  <option value="user">Usuários Comuns</option>
+                  <option value="admin">Administradores</option>
+                </select>
+                <select style={{ ...inputStyle, flex: '0 0 auto', width: 'auto' }} value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
+                  <option value="all">Todos os Status</option>
+                  <option value="active">Ativos</option>
+                  <option value="deleted">Excluídos (Soft)</option>
+                </select>
+              </div>
+
+              <div className="data-table-wrapper" style={{ overflowX: 'auto' }}>
+                <table className="data-table" style={{ width: '100%', minWidth: '800px' }}>
+                  <thead>
+                    <tr>
+                      <th>Nome / Apelido</th>
+                      <th>Email</th>
+                      <th>Papel</th>
+                      <th>Saldo</th>
+                      <th>Status</th>
+                      <th>Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {data?.users.filter(u => {
+                      const regex = new RegExp(filterText, 'i');
+                      const textMatch = regex.test(u.firstName) || regex.test(u.lastName) || regex.test(u.nickname) || regex.test(u.email);
+                      const roleMatch = filterRole === 'all' || u.role === filterRole;
+                      const statusMatch = filterStatus === 'all' || (filterStatus === 'active' && u.deleted === 0) || (filterStatus === 'deleted' && u.deleted !== 0);
+                      return textMatch && roleMatch && statusMatch;
+                    }).map((u) => (
+                      <tr key={u.id}>
+                        <td>
+                          <div style={{ fontWeight: 600 }}>{u.firstName} {u.lastName}</div>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--accent-primary-light)' }}>@{u.nickname}</div>
+                        </td>
+                        <td style={{ color: 'var(--text-secondary)' }}>{u.email}</td>
+                        <td>
+                          {u.role === 'admin' 
+                            ? <span className="badge badge-info" style={{ padding: '2px 8px' }}>Admin</span>
+                            : <span className="badge badge-secondary" style={{ padding: '2px 8px' }}>Usuário</span>}
+                        </td>
+                        <td style={{ color: 'var(--accent-success)', fontWeight: 600 }}>
+                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(u.amount)}
+                        </td>
+                        <td>
+                          {u.deleted === 0
+                            ? <span className="badge badge-success" style={{ padding: '2px 8px' }}>Ativo</span>
+                            : <span className="badge badge-danger" style={{ padding: '2px 8px' }}>Excluído</span>}
+                        </td>
+                        <td>
+                          {u.deleted === 0 && (
+                            <button
+                              onClick={() => { if (confirm(`Tem certeza que deseja excluir ${u.firstName}?`)) adminAction('deleteUser', { userId: u.id }); }}
+                              className="btn btn-outline" style={{ padding: '4px 10px', fontSize: '0.75rem', color: '#f87171', borderColor: '#f87171' }}
+                            >
+                              Excluir
+                            </button>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}

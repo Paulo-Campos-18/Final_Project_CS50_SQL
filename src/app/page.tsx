@@ -138,29 +138,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Quick Stats */}
-      <section className="section" id="store-stats">
-        <div className="container">
-          <div className="section-header">
-            <div>
-              <h2 className="section-title">📈 Store Overview</h2>
-              <p className="section-subtitle">Key metrics at a glance</p>
-            </div>
-          </div>
 
-          <div className="stats-grid">
-            <StatCard icon="🎮" value={stats.totalGames} label="Jogos Cadastrados" color="purple" />
-            <StatCard icon="👥" value={stats.totalUsers} label="Usuários Ativos" color="cyan" />
-            <StatCard icon="🔑" value={stats.availableKeys} label="Chaves em Estoque" color="amber" />
-            <StatCard
-              icon="💰"
-              value={new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(stats.totalRevenue)}
-              label="Receita Total"
-              color="green"
-            />
-          </div>
-        </div>
-      </section>
 
       {/* CTA Section */}
       <section className="section">
