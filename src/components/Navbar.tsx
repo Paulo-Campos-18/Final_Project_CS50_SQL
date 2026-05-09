@@ -7,6 +7,7 @@ import { useCart } from '@/context/CartContext';
 import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { useCurrency, CURRENCIES, CurrencyCode } from '@/context/CurrencyContext';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -15,6 +16,7 @@ export default function Navbar() {
   const { theme, toggleTheme } = useTheme();
   const { user, login, register, updateUser, logout } = useAuth();
   const { language, t, toggleLanguage } = useLanguage();
+  const { currency, setCurrency, format } = useCurrency();
 
   // Modal state
   const [showAuthModal, setShowAuthModal] = useState(false);
@@ -128,6 +130,7 @@ export default function Navbar() {
   const publicLinks = [
     { href: '/', label: t('navHome') },
     { href: '/games', label: t('navGames') },
+    { href: '/deals', label: language === 'pt-BR' ? 'Promoções' : 'Deals' },
     { href: '/wishlist', label: t('navWishlist') },
   ];
 
@@ -141,8 +144,8 @@ export default function Navbar() {
     ...(user?.role === 'admin' ? adminLinks : []),
   ];
 
-  const formatBRL = (value: number) =>
-    new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
+  // user.amount is stored as a USD-equivalent wallet balance
+  const formatBRL = (value: number) => format(value);
 
   const inputStyle: React.CSSProperties = {
     width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-sm)',
@@ -230,11 +233,59 @@ export default function Navbar() {
                 {/* Dropdown Menu */}
                 {showUserMenu && (
                   <div style={{
-                    position: 'absolute', top: 'calc(100% + 8px)', right: 0, minWidth: '200px',
+                    position: 'absolute', top: 'calc(100% + 8px)', right: 0, minWidth: '260px',
                     background: 'var(--bg-secondary)', border: '1px solid var(--border-color)',
                     borderRadius: 'var(--radius-md)', boxShadow: 'var(--shadow-lg)',
                     overflow: 'hidden', zIndex: 1500, padding: '6px 0',
                   }}>
+                    {/* Currency selector */}
+                    <div style={{ padding: '10px 14px 4px' }}>
+                      <div style={{
+                        fontFamily: 'var(--font-mono)', fontSize: '0.62rem',
+                        letterSpacing: '0.18em', color: 'var(--text-muted)',
+                        marginBottom: 6, paddingLeft: 2,
+                      }}>
+                        {language === 'pt-BR' ? 'MOEDA' : 'CURRENCY'}
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                        {(Object.values(CURRENCIES) as Array<{ code: CurrencyCode; symbol: string; rate: number; flag: string; label: string }>).map((c) => {
+                          const active = currency === c.code;
+                          return (
+                            <button
+                              key={c.code}
+                              onClick={() => setCurrency(c.code)}
+                              style={{
+                                display: 'flex', alignItems: 'center', gap: 8,
+                                padding: '8px 10px', borderRadius: 'var(--radius-sm)',
+                                border: `1px solid ${active ? 'var(--accent-primary)' : 'var(--border-color)'}`,
+                                background: active ? 'var(--bg-glass-hover)' : 'transparent',
+                                color: 'var(--text-primary)',
+                                cursor: 'pointer', textAlign: 'left',
+                                transition: 'all 0.15s',
+                              }}
+                            >
+                              <span style={{ fontSize: '0.95rem', lineHeight: 1 }}>{c.flag}</span>
+                              <div style={{ minWidth: 0, lineHeight: 1.15 }}>
+                                <div style={{
+                                  fontFamily: 'var(--font-mono)', fontSize: '0.7rem', fontWeight: 600,
+                                  color: active ? 'var(--accent-primary)' : 'var(--text-primary)',
+                                }}>
+                                  {c.code}
+                                </div>
+                                <div style={{
+                                  fontFamily: 'var(--font-mono)', fontSize: '0.6rem',
+                                  color: 'var(--text-muted)',
+                                }}>
+                                  {c.symbol} · {c.rate.toFixed(2)}
+                                </div>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                    <div style={{ height: '1px', background: 'var(--border-color)', margin: '8px 0 4px' }} />
+
                     {[
                       { label: `👤 ${t('myProfile')}`, href: '/profile' },
                       { label: `🔑 ${t('myKeys')}`, href: '/my-keys' },

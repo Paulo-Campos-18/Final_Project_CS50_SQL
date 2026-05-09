@@ -6,6 +6,7 @@ import { CartProvider } from '@/context/CartContext';
 import { ThemeProvider } from '@/context/ThemeContext';
 import { AuthProvider } from '@/context/AuthContext';
 import { LanguageProvider } from '@/context/LanguageContext';
+import { CurrencyProvider } from '@/context/CurrencyContext';
 import CartDrawer from '@/components/CartDrawer';
 
 export const metadata: Metadata = {
@@ -24,14 +25,16 @@ export default function RootLayout({
       <body>
         <ThemeProvider>
           <LanguageProvider>
-            <AuthProvider>
-              <CartProvider>
-              <Navbar />
-              <CartDrawer />
-              <div className="page-wrapper">{children}</div>
-              <Footer />
-            </CartProvider>
-          </AuthProvider>
+            <CurrencyProvider>
+              <AuthProvider>
+                <CartProvider>
+                  <Navbar />
+                  <CartDrawer />
+                  <div className="page-wrapper">{children}</div>
+                  <Footer />
+                </CartProvider>
+              </AuthProvider>
+            </CurrencyProvider>
           </LanguageProvider>
         </ThemeProvider>
       </body>

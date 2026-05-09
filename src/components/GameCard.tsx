@@ -4,6 +4,7 @@ import Link from 'next/link';
 import AddToCartButton from './AddToCartButton';
 import WishlistToggle from './WishlistToggle';
 import { useLanguage } from '@/context/LanguageContext';
+import { useCurrency } from '@/context/CurrencyContext';
 
 interface GameCardProps {
   id: number;
@@ -15,6 +16,7 @@ interface GameCardProps {
   genres?: string[];
   coverImageUrl?: string | null;
   tagline?: string | null;
+  msrp?: number | null;
 }
 
 // Procedural fallback gradient by name (only used when no cover URL is present)
@@ -45,9 +47,13 @@ export default function GameCard({
   genres,
   coverImageUrl,
   tagline,
+  msrp,
 }: GameCardProps) {
   const { dict } = useLanguage();
+  const { format } = useCurrency();
   const platformLabel = (dict.platformMap as Record<string, string>)?.[platform] || platform;
+  const hasDeal = msrp != null && msrp > price;
+  const discount = hasDeal ? Math.round((1 - price / (msrp as number)) * 100) : 0;
 
   return (
     <Link href={`/games/${id}`} className="game-card" id={`game-card-${id}`}>
@@ -67,15 +73,37 @@ export default function GameCard({
         )}
         <div className="game-card-image-shade" aria-hidden />
         <span className="game-card-platform">{platformLabel}</span>
+        {hasDeal && (
+          <span
+            className="game-card-discount"
+            aria-label={`${discount} percent off`}
+          >
+            −{discount}%
+          </span>
+        )}
         {tagline && <span className="game-card-tagline">{tagline}</span>}
       </div>
       <div className="game-card-body">
         <h3 className="game-card-title">{name}</h3>
         <p className="game-card-studio">{studio}</p>
         <div className="game-card-meta">
-          <span className="game-card-price">
-            {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(price)}
-          </span>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1.1 }}>
+            {hasDeal && (
+              <span
+                style={{
+                  fontFamily: 'var(--font-mono)',
+                  fontSize: '0.7rem',
+                  color: 'var(--text-muted)',
+                  textDecoration: 'line-through',
+                }}
+              >
+                {format(msrp as number)}
+              </span>
+            )}
+            <span className="game-card-price">
+              {price === 0 ? 'Free-to-play' : format(price)}
+            </span>
+          </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             {rating != null && (
               <span className="game-card-rating">
