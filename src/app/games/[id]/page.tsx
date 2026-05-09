@@ -42,8 +42,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { id } = await params;
   const game = db.select({ name: games.name }).from(games).where(eq(games.id, Number(id))).get();
   return {
-    title: game ? `${game.name} — KeyVault` : 'Game Not Found — KeyVault',
-    description: game ? `Buy ${game.name} game keys on KeyVault.` : 'Game not found.',
+    title: game ? `${game.name} — KEYFORGE` : 'Game Not Found — KEYFORGE',
+    description: game ? `Buy ${game.name} digital keys on KEYFORGE.` : 'Game not found.',
   };
 }
 
@@ -58,6 +58,9 @@ async function getGameDetail(id: number) {
       releaseDate: games.releaseDate,
       price: games.price,
       platform: platforms.name,
+      coverImageUrl: games.coverImageUrl,
+      tagline: games.tagline,
+      features: games.features,
     })
     .from(games)
     .innerJoin(platforms, eq(games.activePlatformId, platforms.id))
@@ -201,12 +204,50 @@ export default async function GameDetailPage({ params }: PageProps) {
           <div className="detail-grid">
             {/* Main Content */}
             <div className="detail-main">
-              <div className="detail-image">
-                <span style={{ zIndex: 1 }}>{icon}</span>
+              <div className="detail-image" style={{ position: 'relative', overflow: 'hidden' }}>
+                {game.coverImageUrl ? (
+                  <img
+                    src={game.coverImageUrl}
+                    alt={game.name}
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                    }}
+                  />
+                ) : (
+                  <span style={{ zIndex: 1 }}>{icon}</span>
+                )}
+                {game.coverImageUrl && (
+                  <div
+                    aria-hidden
+                    style={{
+                      position: 'absolute',
+                      inset: 0,
+                      background:
+                        'linear-gradient(180deg, oklch(0 0 0 / 0) 30%, oklch(0 0 0 / 0.78) 100%)',
+                    }}
+                  />
+                )}
               </div>
 
               <div>
                 <h1 className="detail-title">{game.name}</h1>
+                {game.tagline && (
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: '0.85rem',
+                      color: 'var(--accent-primary)',
+                      letterSpacing: '0.04em',
+                      marginTop: 4,
+                    }}
+                  >
+                    {game.tagline}
+                  </p>
+                )}
                 <p className="detail-studio">{t.gameBy} {game.studio}</p>
               </div>
 

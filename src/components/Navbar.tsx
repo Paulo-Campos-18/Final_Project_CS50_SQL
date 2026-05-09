@@ -161,7 +161,10 @@ export default function Navbar() {
         <div className="navbar-inner">
           <Link href="/" className="navbar-logo">
             <div className="navbar-logo-icon">🔑</div>
-            <span>KeyVault</span>
+            <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
+              <span style={{ fontFamily: 'var(--font-display)', fontWeight: 600, letterSpacing: '0.01em' }}>KEYFORGE</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.22em', color: 'var(--text-muted)', marginTop: 2 }}>DIGITAL KEY VAULT</span>
+            </div>
           </Link>
 
           <ul className="navbar-links">

@@ -3,6 +3,11 @@ import { db } from '@/infra/database/connection';
 import { users } from '@/infra/database/schema';
 import { eq, and } from 'drizzle-orm';
 
+/**
+ * Admin-only login endpoint.
+ * Returns 403 for non-admin accounts so the public /login flow stays separated
+ * from the admin panel access.
+ */
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
@@ -26,26 +31,24 @@ export async function POST(request: NextRequest) {
       .get();
 
     if (!user) {
-      return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 401 });
+      return NextResponse.json({ error: 'Conta administrativa não encontrada' }, { status: 401 });
     }
 
     if (user.password !== password) {
       return NextResponse.json({ error: 'Senha incorreta' }, { status: 401 });
     }
 
-    // User-side login: do not allow administrators in here.
-    if (user.role === 'admin') {
+    if (user.role !== 'admin') {
       return NextResponse.json(
-        { error: 'Esta conta é administrativa. Use o painel de administrador (/admin/login).' },
+        { error: 'Esta conta não tem privilégios administrativos.' },
         { status: 403 },
       );
     }
 
     const { password: _, ...safeUser } = user;
-
     return NextResponse.json({ user: safeUser });
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Admin login error:', error);
     return NextResponse.json({ error: 'Erro interno do servidor' }, { status: 500 });
   }
 }

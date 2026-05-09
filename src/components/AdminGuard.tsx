@@ -10,7 +10,7 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     if (!isLoading && (!user || user.role !== 'admin')) {
-      router.push('/');
+      router.push('/admin/login');
     }
   }, [user, isLoading, router]);
 
@@ -25,8 +25,8 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
   if (!user || user.role !== 'admin') {
     return (
       <div className="container" style={{ paddingTop: '100px', textAlign: 'center' }}>
-        <h1 className="section-title">🔒 Acesso Negado</h1>
-        <p className="section-subtitle">Você não tem permissão para acessar esta página.</p>
+        <h1 className="section-title">🔒 Acesso administrativo</h1>
+        <p className="section-subtitle">Redirecionando para o login do painel...</p>
       </div>
     );
   }

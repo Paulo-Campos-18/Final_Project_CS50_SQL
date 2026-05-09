@@ -12,6 +12,8 @@ interface Game {
   platform: string;
   avgRating: number | null;
   genres: string[];
+  coverImageUrl?: string | null;
+  tagline?: string | null;
 }
 
 interface GamesFilterProps {
@@ -91,6 +93,8 @@ export default function GamesFilter({ games, genres, platforms }: GamesFilterPro
               platform={game.platform}
               rating={game.avgRating}
               genres={game.genres}
+              coverImageUrl={game.coverImageUrl}
+              tagline={game.tagline}
             />
           ))}
         </div>

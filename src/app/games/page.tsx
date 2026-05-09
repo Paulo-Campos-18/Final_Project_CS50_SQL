@@ -7,8 +7,8 @@ import { cookies } from 'next/headers';
 import { getDictionary } from '@/i18n';
 
 export const metadata: Metadata = {
-  title: 'Games Catalog — KeyVault',
-  description: 'Browse all available games in the KeyVault store. Filter by genre and platform.',
+  title: 'Catálogo — KEYFORGE',
+  description: 'Browse all available games in the KEYFORGE store. Filter by genre and platform.',
 };
 
 async function getGames() {
@@ -20,6 +20,8 @@ async function getGames() {
       studio: games.studio,
       price: games.price,
       platform: platforms.name,
+      coverImageUrl: games.coverImageUrl,
+      tagline: games.tagline,
       avgRating: avg(gameRating.rating).as('avgRating'),
     })
     .from(games)

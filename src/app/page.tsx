@@ -16,6 +16,8 @@ async function getHomeData() {
       studio: games.studio,
       price: games.price,
       platform: platforms.name,
+      coverImageUrl: games.coverImageUrl,
+      tagline: games.tagline,
       avgRating: avg(gameRating.rating).as('avgRating'),
     })
     .from(games)
@@ -116,6 +118,8 @@ export default async function HomePage() {
                 platform={game.platform}
                 rating={game.avgRating}
                 genres={game.genres}
+                coverImageUrl={game.coverImageUrl}
+                tagline={game.tagline}
               />
             ))}
           </div>

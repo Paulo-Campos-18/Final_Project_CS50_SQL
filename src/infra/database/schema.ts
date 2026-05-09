@@ -31,11 +31,15 @@ export const platforms = sqliteTable('platforms', {
 export const games = sqliteTable('games', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   activePlatformId: integer('active_platform_id').notNull().references(() => platforms.id),
-  name: text('name', { length: 40 }).notNull().unique(),
-  studio: text('studio', { length: 30 }).notNull(),
+  name: text('name').notNull().unique(),
+  studio: text('studio', { length: 60 }).notNull(),
   description: text('description'),
   releaseDate: text('release_date'),
   price: real('price').notNull(),
+  coverImageUrl: text('cover_image_url'),
+  tagline: text('tagline'),
+  features: text('features'),
+  rawgRating: real('rawg_rating'),
   deleted: integer('deleted').notNull().default(0),
 });
 

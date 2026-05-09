@@ -19,6 +19,7 @@ interface AuthContextProps {
   login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   register: (data: RegisterData) => Promise<{ success: boolean; error?: string }>;
   updateUser: (data: { firstName?: string; lastName?: string; nickname?: string }) => Promise<{ success: boolean; error?: string }>;
+  setAuthenticatedUser: (user: AuthUser) => void;
   logout: () => void;
   isLoading: boolean;
 }
@@ -107,6 +108,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const setAuthenticatedUser = (u: AuthUser) => {
+    setUser(u);
+    localStorage.setItem('keyvault-auth', JSON.stringify(u));
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem('keyvault-auth');
@@ -114,7 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, updateUser, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, login, register, updateUser, setAuthenticatedUser, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

@@ -29,11 +29,15 @@ CREATE TABLE "platforms" (
 CREATE TABLE "games" (
   "id" INTEGER PRIMARY KEY AUTOINCREMENT,
   "active_platform_id" INTEGER NOT NULL,
-  "name" VARCHAR(40) NOT NULL UNIQUE,
-  "studio" VARCHAR(30) NOT NULL ,
+  "name" TEXT NOT NULL UNIQUE,
+  "studio" VARCHAR(60) NOT NULL,
   "description" TEXT,
   "release_date" DATETIME,
   "price" NUMERIC NOT NULL CHECK(price >= 0),
+  "cover_image_url" TEXT,
+  "tagline" TEXT,
+  "features" TEXT, -- JSON array stringified
+  "rawg_rating" NUMERIC,
   "deleted" INTEGER NOT NULL DEFAULT 0 CHECK("deleted" IN (0,1)), --1 = deleted
   FOREIGN KEY ("active_platform_id") REFERENCES "platforms"("id")
 );

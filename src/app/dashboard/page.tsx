@@ -12,7 +12,7 @@ import { cookies } from 'next/headers';
 import { getDictionary } from '@/i18n';
 
 export const metadata: Metadata = {
-  title: 'Dashboard — KeyVault',
+  title: 'Dashboard — KEYFORGE',
   description: 'Admin dashboard with revenue analytics, key inventory, and business insights.',
 };
 

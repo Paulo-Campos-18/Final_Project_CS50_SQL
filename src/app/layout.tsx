@@ -9,9 +9,9 @@ import { LanguageProvider } from '@/context/LanguageContext';
 import CartDrawer from '@/components/CartDrawer';
 
 export const metadata: Metadata = {
-  title: 'KeyVault — Loja de Chaves de Jogos',
+  title: 'KEYFORGE — Digital Key Vault',
   description:
-    'Compre e revenda chaves digitais de jogos. Explore o catálogo, acompanhe os preços e gerencie sua coleção. CS50 SQL Final Project.',
+    'KEYFORGE — sua loja de chaves digitais. Cofre seguro, vitrine cuidada e dashboards reais por trás de cada compra.',
 };
 
 export default function RootLayout({
