@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/infra/database/connection';
-import { games, genres, gameGenres, users, suppliers, platforms } from '@/infra/database/schema';
-import { eq } from 'drizzle-orm';
+import { games, genres, gameGenres, users, suppliers, platforms, gamePriceLog } from '@/infra/database/schema';
+import { eq, sql } from 'drizzle-orm';
 
 export async function POST(request: NextRequest) {
   try {
@@ -66,6 +66,35 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ message: 'Categoria adicionada!' }, { status: 201 });
       }
 
+      case 'setDiscount': {
+        const { gameId, discountPercent } = data;
+        if (!gameId) return NextResponse.json({ error: 'gameId obrigatório' }, { status: 400 });
+        const game = db.select({ price: games.price, name: games.name }).from(games).where(eq(games.id, Number(gameId))).get();
+        if (!game) return NextResponse.json({ error: 'Jogo não encontrado' }, { status: 404 });
+        const pct = Math.max(0, Math.min(90, Number(discountPercent) || 0));
+        // peak = highest old_price ever logged or current price (whichever bigger)
+        const peakRow = db
+          .select({ peak: sql<number | null>`MAX(${gamePriceLog.oldPrice})`.as('peak') })
+          .from(gamePriceLog)
+          .where(eq(gamePriceLog.gameId, Number(gameId)))
+          .get();
+        const peak = Math.max(Number(game.price), Number(peakRow?.peak ?? 0));
+        const newPrice = Math.round(peak * (1 - pct / 100) * 100) / 100;
+        if (Math.abs(newPrice - Number(game.price)) > 0.005) {
+          db.insert(gamePriceLog).values({
+            gameId: Number(gameId),
+            oldPrice: Number(game.price),
+            newPrice,
+          }).run();
+          db.update(games).set({ price: newPrice }).where(eq(games.id, Number(gameId))).run();
+        }
+        return NextResponse.json({
+          message: pct === 0 ? `Preço de ${game.name} restaurado para $${peak}` : `${game.name}: -${pct}% (de $${peak} para $${newPrice})`,
+          newPrice,
+          peak,
+        });
+      }
+
       case 'updateGameGenres': {
         const { gameId, genreIds } = data;
         if (!gameId || !Array.isArray(genreIds)) return NextResponse.json({ error: 'Dados inválidos' }, { status: 400 });
@@ -89,7 +118,19 @@ export async function POST(request: NextRequest) {
 
 // GET: fetch data needed by admin forms
 export async function GET() {
-  const allGames = db.select({ id: games.id, name: games.name }).from(games).where(eq(games.deleted, 0)).all();
+  const allGames = db
+    .select({
+      id: games.id,
+      name: games.name,
+      price: games.price,
+      coverImageUrl: games.coverImageUrl,
+      peak: sql<number | null>`MAX(${gamePriceLog.oldPrice})`.as('peak'),
+    })
+    .from(games)
+    .leftJoin(gamePriceLog, eq(gamePriceLog.gameId, games.id))
+    .where(eq(games.deleted, 0))
+    .groupBy(games.id)
+    .all();
   const allGenres = db.select({ id: genres.id, name: genres.name }).from(genres).all();
   const allPlatforms = db.select({ id: platforms.id, name: platforms.name }).from(platforms).all();
   const allUsers = db.select({

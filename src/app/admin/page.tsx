@@ -5,14 +5,14 @@ import { useEffect, useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 
 type AdminData = {
-  games: { id: number; name: string }[];
+  games: { id: number; name: string; price: number; coverImageUrl: string | null; peak: number | null }[];
   genres: { id: number; name: string }[];
   platforms: { id: number; name: string }[];
   users: { id: number; firstName: string; lastName: string; nickname: string; email: string; deleted: number; role: string; amount: number }[];
   gameGenresMap: Record<number, number[]>;
 };
 
-type TabId = 'addGame' | 'createUser' | 'viewUsers' | 'addSupplier' | 'addGenre' | 'editGameGenres';
+type TabId = 'addGame' | 'createUser' | 'viewUsers' | 'addSupplier' | 'addGenre' | 'editGameGenres' | 'discounts';
 
 const inputStyle: React.CSSProperties = {
   width: '100%', padding: '10px 14px', borderRadius: 'var(--radius-sm)',
@@ -40,6 +40,7 @@ export default function AdminPage() {
     { id: 'addSupplier', label: t('adminTabAddSupplier'), icon: '📦' },
     { id: 'addGenre', label: t('adminTabAddGenre'), icon: '🏷️' },
     { id: 'editGameGenres', label: t('adminTabEditGenres'), icon: '✏️' },
+    { id: 'discounts', label: 'Promoções', icon: '🏷' },
   ];
 
   // Form states
@@ -352,8 +353,130 @@ export default function AdminPage() {
               )}
             </div>
           )}
+
+          {activeTab === 'discounts' && (
+            <div>
+              <h2 style={{ marginBottom: '8px', fontFamily: 'var(--font-display)' }}>🏷 Promoções</h2>
+              <p className="section-subtitle" style={{ marginBottom: '20px' }}>
+                Aplique descontos em jogos do catálogo. O preço novo é gravado em <code>game_price_log</code> e fica disponível em <code>/deals</code>.
+              </p>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {data?.games.map((g) => {
+                  const peak = Number(g.peak ?? g.price);
+                  const current = Number(g.price);
+                  const currentDiscount = peak > current ? Math.round((1 - current / peak) * 100) : 0;
+                  return (
+                    <DiscountRow
+                      key={g.id}
+                      game={g}
+                      peak={peak}
+                      currentDiscount={currentDiscount}
+                      disabled={loading}
+                      onApply={(percent) => adminAction('setDiscount', { gameId: g.id, discountPercent: percent })}
+                    />
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </main>
     </AdminGuard>
+  );
+}
+
+function DiscountRow({
+  game,
+  peak,
+  currentDiscount,
+  disabled,
+  onApply,
+}: {
+  game: { id: number; name: string; price: number; coverImageUrl: string | null };
+  peak: number;
+  currentDiscount: number;
+  disabled: boolean;
+  onApply: (percent: number) => void;
+}) {
+  const [pct, setPct] = useState<number>(currentDiscount);
+  const newPrice = Math.round(peak * (1 - pct / 100) * 100) / 100;
+  const fmt = (v: number) => `$${v.toFixed(2)}`;
+
+  return (
+    <div
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '64px minmax(0, 1.6fr) minmax(160px, 1fr) auto auto',
+        alignItems: 'center',
+        gap: 16,
+        padding: 12,
+        background: 'var(--bg-card)',
+        border: '1px solid var(--border-color)',
+        borderRadius: 'var(--radius-md)',
+      }}
+    >
+      <div
+        style={{
+          width: 64, height: 64, borderRadius: 'var(--radius-sm)',
+          background: game.coverImageUrl ? `center / cover url(${game.coverImageUrl})` : 'var(--bg-tertiary)',
+        }}
+      />
+      <div style={{ minWidth: 0 }}>
+        <div
+          style={{
+            fontFamily: 'var(--font-display)', fontSize: '0.95rem', fontWeight: 600,
+            color: 'var(--text-primary)',
+            overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+          }}
+        >
+          {game.name}
+        </div>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+          pico {fmt(peak)} · atual{' '}
+          <span style={{ color: currentDiscount > 0 ? 'var(--accent-primary)' : 'var(--text-secondary)' }}>
+            {fmt(game.price)}
+          </span>
+          {currentDiscount > 0 && <span style={{ marginLeft: 8 }}>−{currentDiscount}%</span>}
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+        <input
+          type="range"
+          min={0} max={75} step={5}
+          value={pct}
+          onChange={(e) => setPct(Number(e.target.value))}
+          style={{ flex: 1, accentColor: 'var(--accent-primary)' }}
+        />
+        <span
+          style={{
+            fontFamily: 'var(--font-mono)', fontSize: '0.85rem', minWidth: 48, textAlign: 'right',
+            color: pct > 0 ? 'var(--accent-primary)' : 'var(--text-muted)',
+          }}
+        >
+          {pct === 0 ? 'sem desc.' : `−${pct}%`}
+        </span>
+      </div>
+
+      <div
+        style={{
+          fontFamily: 'var(--font-display)', fontWeight: 600, color: 'var(--accent-primary)',
+          fontSize: '1rem', minWidth: 80, textAlign: 'right',
+        }}
+      >
+        {fmt(newPrice)}
+      </div>
+
+      <button
+        type="button"
+        disabled={disabled || pct === currentDiscount}
+        onClick={() => onApply(pct)}
+        className="btn btn-primary"
+        style={{ padding: '8px 14px', fontSize: '0.82rem', opacity: pct === currentDiscount ? 0.4 : 1 }}
+      >
+        Aplicar
+      </button>
+    </div>
   );
 }
