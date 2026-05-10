@@ -41,7 +41,7 @@ const TopNav = ({ view, route, onNavigate, onCartClick }) => {
             <button key={it.key} onClick={() => onNavigate({ route: it.key })}
                     style={{ color: route === it.key ? tk.text : tk.textMuted }}>{it.label}</button>
           ))}
-          <button onClick={() => onNavigate({ route: "admin" })}
+          <button onClick={() => { window.location.href = "/admin/login"; }}
                   style={{ color: route === "admin" ? tk.accent : tk.textMuted }}>
             {t("nav.admin")}
           </button>
@@ -153,7 +153,7 @@ const TopNav = ({ view, route, onNavigate, onCartClick }) => {
                       { icon: "Heart",    label: t("profile.wishlist"), count: WISHLIST.filter((w) => w.user_id === 1).length },
                       { icon: "Library",  label: t("profile.library") },
                       { icon: "Receipt",  label: t("profile.orders") },
-                      { icon: "ShieldCheck", label: t("profile.admin"), action: () => onNavigate({ route: "admin" }) },
+                      { icon: "ShieldCheck", label: t("profile.admin"), action: () => { window.location.href = "/admin/login"; } },
                     ].map((m) => (
                       <button key={m.label}
                               onClick={() => { setProfileOpen(false); m.action && m.action(); }}
