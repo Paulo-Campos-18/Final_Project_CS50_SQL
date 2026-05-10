@@ -1,11 +1,12 @@
 import { db } from '@/infra/database/connection';
 import {
-  games, platforms, keys, keyStatus, keyBatches, suppliers,
+  games, keys, keyStatus, keyBatches, suppliers,
   orders, orderKeys, transactions, paymentMethod,
   gameRating, users,
 } from '@/infra/database/schema';
-import { eq, sql, count, sum, avg, and } from 'drizzle-orm';
+import { eq, sql, count, sum, avg } from 'drizzle-orm';
 import StatCard from '@/components/StatCard';
+import DashboardCharts from '@/components/DashboardCharts';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
@@ -123,6 +124,22 @@ async function getDashboardData() {
     .orderBy(sql`avgRating DESC`)
     .all();
 
+  // ─── Daily revenue series (last ~90 days, by transaction date) ───
+  const dailyRows = db
+    .select({
+      date: sql<string>`SUBSTR(${transactions.transactionDatetime}, 1, 10)`.as('date'),
+      revenue: sql<number>`SUM(${transactions.totalPrice})`.as('revenue'),
+    })
+    .from(transactions)
+    .where(eq(transactions.status, 'Sold'))
+    .groupBy(sql`SUBSTR(${transactions.transactionDatetime}, 1, 10)`)
+    .orderBy(sql`date ASC`)
+    .all();
+  const revenueSeries = dailyRows.map((r) => ({
+    date: r.date,
+    revenue: Number(r.revenue ?? 0),
+  }));
+
   // ─── Aggregate stats ───
   const totalGames = db.select({ count: count() }).from(games).where(eq(games.deleted, 0)).get();
   const totalUsers = db.select({ count: count() }).from(users).where(eq(users.deleted, 0)).get();
@@ -131,6 +148,14 @@ async function getDashboardData() {
   const totalKeysCount = db.select({ count: count() }).from(keys).get();
   const overallProfit = profitPerGame.reduce((acc, g) => acc + g.profit, 0);
 
+  // ─── Payment mix (with percentages) ───
+  const totalPmTx = paymentMethodStats.reduce((a, b) => a + Number(b.count), 0) || 1;
+  const paymentMix = paymentMethodStats.map((pm) => ({
+    method: pm.methodName,
+    count: Number(pm.count),
+    pct: (Number(pm.count) / totalPmTx) * 100,
+  }));
+
   return {
     profitPerGame,
     mostSold,
@@ -138,6 +163,8 @@ async function getDashboardData() {
     keysBySupplier,
     paymentMethodStats,
     topRated,
+    revenueSeries,
+    paymentMix,
     stats: {
       totalGames: totalGames?.count ?? 0,
       totalUsers: totalUsers?.count ?? 0,
@@ -196,6 +223,18 @@ export default async function DashboardPage() {
               color={data.stats.overallProfit >= 0 ? 'green' : 'red'}
             />
           </div>
+
+          {/* Recharts visual block */}
+          <DashboardCharts
+            revenueSeries={data.revenueSeries}
+            inventory={data.keysPerStatus.map((k) => ({ status: k.status, count: Number(k.count) }))}
+            topGames={data.profitPerGame
+              .filter((g) => g.revenue > 0)
+              .sort((a, b) => b.revenue - a.revenue)
+              .slice(0, 8)
+              .map((g) => ({ name: g.gameName, revenue: g.revenue }))}
+            paymentMix={data.paymentMix}
+          />
 
           {/* Charts Grid */}
           <div className="dashboard-grid">

@@ -48,6 +48,8 @@ export async function getWishlist(userId: number) {
       studio: games.studio,
       price: games.price,
       platform: platforms.name,
+      coverImageUrl: games.coverImageUrl,
+      tagline: games.tagline,
       avgRating: avg(gameRating.rating),
     })
     .from(wishlist)
@@ -58,5 +60,8 @@ export async function getWishlist(userId: number) {
     .groupBy(games.id)
     .all();
 
-  return data;
+  return data.map((d) => ({
+    ...d,
+    avgRating: d.avgRating != null ? Number(d.avgRating) : null,
+  }));
 }

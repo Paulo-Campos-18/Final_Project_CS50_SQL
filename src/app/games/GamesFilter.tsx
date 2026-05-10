@@ -1,20 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import GameCard from '@/components/GameCard';
+import GameShelf, { ShelfGame } from '@/components/GameShelf';
 import { useLanguage } from '@/context/LanguageContext';
 
-interface Game {
-  id: number;
-  name: string;
-  studio: string;
-  price: number;
-  platform: string;
-  avgRating: number | null;
-  genres: string[];
-  coverImageUrl?: string | null;
-  tagline?: string | null;
-}
+interface Game extends ShelfGame {}
 
 interface GamesFilterProps {
   games: Game[];
@@ -22,23 +13,86 @@ interface GamesFilterProps {
   platforms: { id: number; name: string }[];
 }
 
+const SHELF_GENRES_PT = [
+  { key: 'Action', label: 'Ação' },
+  { key: 'RPG', label: 'RPG' },
+  { key: 'Indie', label: 'Indie' },
+  { key: 'Adventure', label: 'Aventura' },
+  { key: 'Shooter', label: 'Shooter' },
+  { key: 'Strategy', label: 'Estratégia' },
+];
+
+const SHELF_GENRES_EN = [
+  { key: 'Action', label: 'Action' },
+  { key: 'RPG', label: 'RPG' },
+  { key: 'Indie', label: 'Indie' },
+  { key: 'Adventure', label: 'Adventure' },
+  { key: 'Shooter', label: 'Shooter' },
+  { key: 'Strategy', label: 'Strategy' },
+];
+
 export default function GamesFilter({ games, genres, platforms }: GamesFilterProps) {
-  const { t, dict } = useLanguage();
+  const { t, dict, language } = useLanguage();
   const [search, setSearch] = useState('');
   const [selectedGenre, setSelectedGenre] = useState<string | null>(null);
   const [selectedPlatform, setSelectedPlatform] = useState<string | null>(null);
 
-  const filtered = games.filter((game) => {
-    const matchesSearch =
-      search === '' ||
-      game.name.toLowerCase().includes(search.toLowerCase()) ||
-      game.studio.toLowerCase().includes(search.toLowerCase());
+  const filtered = useMemo(
+    () =>
+      games.filter((game) => {
+        const matchesSearch =
+          search === '' ||
+          game.name.toLowerCase().includes(search.toLowerCase()) ||
+          game.studio.toLowerCase().includes(search.toLowerCase());
+        const matchesGenre = !selectedGenre || game.genres.includes(selectedGenre);
+        const matchesPlatform = !selectedPlatform || game.platform === selectedPlatform;
+        return matchesSearch && matchesGenre && matchesPlatform;
+      }),
+    [games, search, selectedGenre, selectedPlatform],
+  );
 
-    const matchesGenre = !selectedGenre || game.genres.includes(selectedGenre);
-    const matchesPlatform = !selectedPlatform || game.platform === selectedPlatform;
+  const isFiltered = !!(search || selectedGenre || selectedPlatform);
+  const shelves = useMemo(() => {
+    if (isFiltered) return [];
+    const list = language === 'pt-BR' ? SHELF_GENRES_PT : SHELF_GENRES_EN;
+    const seenInShelf = new Set<number>();
 
-    return matchesSearch && matchesGenre && matchesPlatform;
-  });
+    // First two shelves: Featured (top rated) + Drops (cards with msrp > price)
+    const featured = [...games]
+      .sort((a, b) => (b.avgRating ?? 0) - (a.avgRating ?? 0))
+      .slice(0, 12);
+    featured.forEach((g) => seenInShelf.add(g.id));
+
+    const drops = games
+      .filter((g) => g.msrp != null && (g.msrp as number) > g.price)
+      .sort((a, b) => 1 - a.price / (a.msrp as number) - (1 - b.price / (b.msrp as number)))
+      .reverse()
+      .slice(0, 12);
+    drops.forEach((g) => seenInShelf.add(g.id));
+
+    const byGenre = list
+      .map((sg) => {
+        const list = games.filter((g) => g.genres.includes(sg.key)).slice(0, 12);
+        return list.length ? { title: sg.label, sub: `GAME ⨝ GENRE · '${sg.key.toLowerCase()}'`, list } : null;
+      })
+      .filter(Boolean) as Array<{ title: string; sub: string; list: Game[] }>;
+
+    return [
+      {
+        title: language === 'pt-BR' ? 'Em destaque' : 'Featured',
+        sub: 'Top rated · ORDER BY rating DESC',
+        list: featured,
+      },
+      ...(drops.length
+        ? [{
+            title: language === 'pt-BR' ? 'Em promoção' : 'On sale',
+            sub: 'Maior queda vs. preço de pico',
+            list: drops,
+          }]
+        : []),
+      ...byGenre,
+    ];
+  }, [games, isFiltered, language]);
 
   return (
     <>
@@ -81,28 +135,37 @@ export default function GamesFilter({ games, genres, platforms }: GamesFilterPro
         </select>
       </div>
 
-      {filtered.length > 0 ? (
-        <div className="game-grid">
-          {filtered.map((game) => (
-            <GameCard
-              key={game.id}
-              id={game.id}
-              name={game.name}
-              studio={game.studio}
-              price={game.price}
-              platform={game.platform}
-              rating={game.avgRating}
-              genres={game.genres}
-              coverImageUrl={game.coverImageUrl}
-              tagline={game.tagline}
-            />
-          ))}
-        </div>
+      {isFiltered ? (
+        filtered.length > 0 ? (
+          <div className="game-grid">
+            {filtered.map((game) => (
+              <GameCard
+                key={game.id}
+                id={game.id}
+                name={game.name}
+                studio={game.studio}
+                price={game.price}
+                platform={game.platform}
+                rating={game.avgRating}
+                genres={game.genres}
+                coverImageUrl={game.coverImageUrl}
+                tagline={game.tagline}
+                msrp={game.msrp}
+              />
+            ))}
+          </div>
+        ) : (
+          <div className="empty-state">
+            <div className="empty-state-icon">🔍</div>
+            <p>{t('filterNoGames')}</p>
+          </div>
+        )
       ) : (
-        <div className="empty-state">
-          <div className="empty-state-icon">🔍</div>
-          <p>{t('filterNoGames')}</p>
-        </div>
+        <>
+          {shelves.map((s) => (
+            <GameShelf key={s.title} title={s.title} subtitle={s.sub} games={s.list} />
+          ))}
+        </>
       )}
     </>
   );

@@ -1,5 +1,5 @@
 import { db } from '@/infra/database/connection';
-import { games, platforms, gameRating, gameGenres, genres } from '@/infra/database/schema';
+import { games, platforms, gameRating, gameGenres, genres, gamePriceLog } from '@/infra/database/schema';
 import { eq, sql, avg } from 'drizzle-orm';
 import type { Metadata } from 'next';
 import GamesFilter from './GamesFilter';
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 };
 
 async function getGames() {
-  // All games with platform and average rating
+  // All games with platform, average rating and peak price (msrp)
   const allGames = db
     .select({
       id: games.id,
@@ -23,10 +23,12 @@ async function getGames() {
       coverImageUrl: games.coverImageUrl,
       tagline: games.tagline,
       avgRating: avg(gameRating.rating).as('avgRating'),
+      msrp: sql<number | null>`MAX(${gamePriceLog.oldPrice})`.as('msrp'),
     })
     .from(games)
     .innerJoin(platforms, eq(games.activePlatformId, platforms.id))
     .leftJoin(gameRating, eq(games.id, gameRating.gameId))
+    .leftJoin(gamePriceLog, eq(gamePriceLog.gameId, games.id))
     .where(eq(games.deleted, 0))
     .groupBy(games.id)
     .orderBy(sql`${games.name} ASC`)
@@ -43,6 +45,7 @@ async function getGames() {
     return {
       ...game,
       avgRating: game.avgRating ? Number(game.avgRating) : null,
+      msrp: game.msrp != null ? Number(game.msrp) : null,
       genres: gameGenresList.map((g) => g.name),
     };
   });

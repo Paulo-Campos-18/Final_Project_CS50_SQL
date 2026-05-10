@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import AddToCartButton from './AddToCartButton';
 import WishlistToggle from './WishlistToggle';
 import { useLanguage } from '@/context/LanguageContext';
@@ -37,6 +38,8 @@ function gradientFor(name: string): string {
   return 'linear-gradient(135deg, oklch(0.22 0.02 280), oklch(0.13 0.02 270))';
 }
 
+const cardSpring = { type: 'spring', stiffness: 260, damping: 22 } as const;
+
 export default function GameCard({
   id,
   name,
@@ -56,74 +59,77 @@ export default function GameCard({
   const discount = hasDeal ? Math.round((1 - price / (msrp as number)) * 100) : 0;
 
   return (
-    <Link href={`/games/${id}`} className="game-card" id={`game-card-${id}`}>
-      <div className="game-card-image">
-        {coverImageUrl ? (
-          <img
-            src={coverImageUrl}
-            alt={name}
-            className="game-card-cover"
-            loading="lazy"
-            onError={(e) => {
-              e.currentTarget.style.display = 'none';
-            }}
-          />
-        ) : (
-          <div className="game-card-cover-fallback" style={{ background: gradientFor(name) }} />
-        )}
-        <div className="game-card-image-shade" aria-hidden />
-        <span className="game-card-platform">{platformLabel}</span>
-        {hasDeal && (
-          <span
-            className="game-card-discount"
-            aria-label={`${discount} percent off`}
-          >
-            −{discount}%
-          </span>
-        )}
-        {tagline && <span className="game-card-tagline">{tagline}</span>}
-      </div>
-      <div className="game-card-body">
-        <h3 className="game-card-title">{name}</h3>
-        <p className="game-card-studio">{studio}</p>
-        <div className="game-card-meta">
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1.1 }}>
-            {hasDeal && (
-              <span
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '0.7rem',
-                  color: 'var(--text-muted)',
-                  textDecoration: 'line-through',
-                }}
-              >
-                {format(msrp as number)}
-              </span>
-            )}
-            <span className="game-card-price">
-              {price === 0 ? 'Free-to-play' : format(price)}
+    <motion.div
+      whileHover={{ y: -6, scale: 1.025 }}
+      transition={cardSpring}
+      style={{ height: '100%', display: 'flex' }}
+    >
+      <Link href={`/games/${id}`} className="game-card" id={`game-card-${id}`} style={{ flex: 1 }}>
+        <div className="game-card-image">
+          {coverImageUrl ? (
+            <img
+              src={coverImageUrl}
+              alt={name}
+              className="game-card-cover"
+              loading="lazy"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+              }}
+            />
+          ) : (
+            <div className="game-card-cover-fallback" style={{ background: gradientFor(name) }} />
+          )}
+          <div className="game-card-image-shade" aria-hidden />
+          <span className="game-card-platform">{platformLabel}</span>
+          {hasDeal && (
+            <span className="game-card-discount" aria-label={`${discount} percent off`}>
+              −{discount}%
             </span>
-          </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            {rating != null && (
-              <span className="game-card-rating">
-                ⭐ {rating.toFixed(1)}
-              </span>
-            )}
-            <WishlistToggle gameId={id} />
-            <AddToCartButton game={{ gameId: id, name, price, platform }} />
-          </div>
+          )}
+          {tagline && <span className="game-card-tagline">{tagline}</span>}
         </div>
-        {genres && genres.length > 0 && (
-          <div className="game-card-genres">
-            {genres.map((g) => (
-              <span key={g} className="genre-tag">
-                {(dict.genreMap as Record<string, string>)?.[g] || g}
+        <div className="game-card-body">
+          <h3 className="game-card-title">{name}</h3>
+          <p className="game-card-studio">{studio}</p>
+          <div className="game-card-meta">
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', lineHeight: 1.1 }}>
+              {hasDeal && (
+                <span
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.7rem',
+                    color: 'var(--text-muted)',
+                    textDecoration: 'line-through',
+                  }}
+                >
+                  {format(msrp as number)}
+                </span>
+              )}
+              <span className="game-card-price">
+                {price === 0 ? 'Free-to-play' : format(price)}
               </span>
-            ))}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              {rating != null && (
+                <span className="game-card-rating">
+                  ⭐ {rating.toFixed(1)}
+                </span>
+              )}
+              <WishlistToggle gameId={id} />
+              <AddToCartButton game={{ gameId: id, name, price, platform }} />
+            </div>
           </div>
-        )}
-      </div>
-    </Link>
+          {genres && genres.length > 0 && (
+            <div className="game-card-genres">
+              {genres.map((g) => (
+                <span key={g} className="genre-tag">
+                  {(dict.genreMap as Record<string, string>)?.[g] || g}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </Link>
+    </motion.div>
   );
 }

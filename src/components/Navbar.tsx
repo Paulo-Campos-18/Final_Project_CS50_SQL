@@ -131,7 +131,7 @@ export default function Navbar() {
     { href: '/', label: t('navHome') },
     { href: '/games', label: t('navGames') },
     { href: '/deals', label: language === 'pt-BR' ? 'Promoções' : 'Deals' },
-    { href: '/wishlist', label: t('navWishlist') },
+    { href: '/library', label: language === 'pt-BR' ? 'Biblioteca' : 'Library' },
   ];
 
   const adminLinks = [
