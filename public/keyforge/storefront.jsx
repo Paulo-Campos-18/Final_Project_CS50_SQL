@@ -84,12 +84,26 @@ const TopNav = ({ view, route, onNavigate, onCartClick }) => {
 
           {onCartClick && <CartButton onClick={onCartClick} />}
 
+          {!authedUser ? (
+            <a href="/login"
+               className="px-3.5 py-1.5 rounded-lg font-mono text-[11px] tracking-[0.16em] transition"
+               style={{
+                 background: tk.accent,
+                 color: theme === "light" ? "white" : "oklch(0.18 0.02 260)",
+                 textDecoration: "none",
+                 fontWeight: 600,
+               }}>
+              {(language === "pt-BR" ? "ENTRAR" : "SIGN IN")}
+            </a>
+          ) : (
           <div className="relative" ref={profileRef}>
             <button onClick={() => setProfileOpen((o) => !o)}
                     className="w-8 h-8 rounded-full flex items-center justify-center border-2 transition relative"
                     style={{ background: "linear-gradient(135deg, oklch(0.85 0.18 165), oklch(0.65 0.16 220))",
                              borderColor: profileOpen ? tk.accent : "transparent" }}>
-              <span className="font-display font-semibold text-[12px]" style={{ color: "oklch(0.18 0.02 260)" }}>M</span>
+              <span className="font-display font-semibold text-[12px]" style={{ color: "oklch(0.18 0.02 260)" }}>
+                {(authedUser.firstName?.[0] || "U").toUpperCase()}
+              </span>
               <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full font-mono text-[7px] flex items-center justify-center font-bold"
                     style={{ background: tk.panelBg, color: tk.text, border: `1px solid ${tk.border}` }}>
                 {CURRENCIES[currency].symbol}
@@ -110,11 +124,23 @@ const TopNav = ({ view, route, onNavigate, onCartClick }) => {
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full flex items-center justify-center"
                            style={{ background: "linear-gradient(135deg, oklch(0.85 0.18 165), oklch(0.65 0.16 220))" }}>
-                        <span className="font-display font-semibold text-[14px]" style={{ color: "oklch(0.18 0.02 260)" }}>M</span>
+                        <span className="font-display font-semibold text-[14px]" style={{ color: "oklch(0.18 0.02 260)" }}>
+                          {(authedUser.firstName?.[0] || "U").toUpperCase()}
+                        </span>
                       </div>
                       <div className="min-w-0">
-                        <div className="font-display text-[14px] font-medium truncate" style={{ color: tk.text }}>Mira Okafor</div>
-                        <div className="font-mono text-[10px] tracking-wider truncate" style={{ color: tk.textDim }}>@miraflux · {fmtMoney(142.50, currency)} {t("profile.wallet")}</div>
+                        <div className="font-display text-[14px] font-medium truncate" style={{ color: tk.text }}>
+                          {authedUser.firstName} {authedUser.lastName}
+                          {isAdmin && (
+                            <span className="ml-2 px-1.5 py-0.5 rounded font-mono text-[9px]"
+                                  style={{ background: tk.accentBg, color: tk.accent, letterSpacing: "0.1em" }}>
+                              ADMIN
+                            </span>
+                          )}
+                        </div>
+                        <div className="font-mono text-[10px] tracking-wider truncate" style={{ color: tk.textDim }}>
+                          @{authedUser.nickname} · {fmtMoney(Number(authedUser.amount || 0), currency)} {t("profile.wallet")}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -171,20 +197,21 @@ const TopNav = ({ view, route, onNavigate, onCartClick }) => {
 
                   <div className="p-2 border-t" style={{ borderColor: tk.borderSoft }}>
                     {[
-                      { icon: "User",     label: t("profile.account") },
-                      { icon: "Heart",    label: t("profile.wishlist"), count: WISHLIST.filter((w) => w.user_id === 1).length },
-                      { icon: "Library",  label: t("profile.library") },
-                      { icon: "Receipt",  label: t("profile.orders") },
+                      { icon: "User",     label: t("profile.account"),  href: "/profile" },
+                      { icon: "Heart",    label: t("profile.wishlist"), href: "/wishlist", count: WISHLIST.filter((w) => w.user_id === authedUser.id).length },
+                      { icon: "Library",  label: t("profile.library"),  href: "/library" },
+                      { icon: "Receipt",  label: t("profile.orders"),   href: "/my-keys" },
                       ...(isAdmin
-                        ? [{ icon: "ShieldCheck", label: t("profile.admin"), action: () => { window.location.href = "/admin"; } }]
+                        ? [{ icon: "ShieldCheck", label: t("profile.admin"), href: "/admin" }]
                         : []),
                     ].map((m) => (
-                      <button key={m.label}
-                              onClick={() => { setProfileOpen(false); m.action && m.action(); }}
-                              className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition text-left"
-                              style={{ color: tk.text }}
-                              onMouseEnter={(e) => e.currentTarget.style.background = theme === "light" ? tk.elevBg : "rgba(255,255,255,0.05)"}
-                              onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
+                      <a key={m.label}
+                         href={m.href}
+                         onClick={() => setProfileOpen(false)}
+                         className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition text-left"
+                         style={{ color: tk.text, textDecoration: "none" }}
+                         onMouseEnter={(e) => e.currentTarget.style.background = theme === "light" ? tk.elevBg : "rgba(255,255,255,0.05)"}
+                         onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
                         <Icon name={m.icon} size={14} color={tk.textMuted} />
                         <span className="font-display text-[13px]">{m.label}</span>
                         {m.count != null && (
@@ -193,11 +220,23 @@ const TopNav = ({ view, route, onNavigate, onCartClick }) => {
                             {m.count}
                           </span>
                         )}
-                      </button>
+                      </a>
                     ))}
                   </div>
                   <div className="p-2 border-t" style={{ borderColor: tk.borderSoft }}>
-                    <button className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left" style={{ color: tk.warn }}>
+                    <button
+                      onClick={() => {
+                        try {
+                          localStorage.removeItem("keyvault-auth");
+                          localStorage.removeItem("keyvault-user");
+                        } catch {}
+                        setAuthedUser(null);
+                        setProfileOpen(false);
+                        // Hard reload so server-side context (cookies, etc) sync.
+                        window.location.href = "/";
+                      }}
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left"
+                      style={{ color: tk.warn }}>
                       <Icon name="LogOut" size={14} />
                       <span className="font-display text-[13px]">{t("profile.signout")}</span>
                     </button>
@@ -206,6 +245,7 @@ const TopNav = ({ view, route, onNavigate, onCartClick }) => {
               )}
             </AnimatePresence>
           </div>
+          )}
         </div>
       </div>
     </header>
@@ -604,23 +644,25 @@ const Vitrine = ({ onOpen }) => {
             </button>
           );
         })}
-        <div className="ml-auto flex items-center gap-2">
-          <div className="flex items-center gap-1 p-0.5 rounded-lg border" style={{ borderColor: tk.borderSoft, background: theme === "light" ? tk.elevBg : "rgba(255,255,255,0.04)" }}>
+        <div className="ml-auto flex items-center gap-3">
+          <div className="flex items-center gap-1 p-1 rounded-lg border" style={{ borderColor: tk.borderSoft, background: theme === "light" ? tk.elevBg : "rgba(255,255,255,0.04)" }}>
             <button onClick={() => setLayout("grid")}
-                    className="px-2.5 py-1 rounded-md font-mono text-[10px] tracking-wider flex items-center gap-1.5 transition"
+                    className="px-3.5 py-1.5 rounded-md font-mono text-[12px] tracking-wider flex items-center gap-2 transition"
                     style={{ background: layout === "grid" ? tk.accent : "transparent",
-                             color: layout === "grid" ? (theme === "light" ? "white" : "oklch(0.18 0.02 260)") : tk.textMuted }}>
-              <Icon name="LayoutGrid" size={11} /> {t("vitrine.viewGrid")}
+                             color: layout === "grid" ? (theme === "light" ? "white" : "oklch(0.18 0.02 260)") : tk.textMuted,
+                             fontWeight: 600 }}>
+              <Icon name="LayoutGrid" size={14} /> {t("vitrine.viewGrid")}
             </button>
             <button onClick={() => setLayout("list")}
-                    className="px-2.5 py-1 rounded-md font-mono text-[10px] tracking-wider flex items-center gap-1.5 transition"
+                    className="px-3.5 py-1.5 rounded-md font-mono text-[12px] tracking-wider flex items-center gap-2 transition"
                     style={{ background: layout === "list" ? tk.accent : "transparent",
-                             color: layout === "list" ? (theme === "light" ? "white" : "oklch(0.18 0.02 260)") : tk.textMuted }}>
-              <Icon name="List" size={11} /> {t("vitrine.viewList")}
+                             color: layout === "list" ? (theme === "light" ? "white" : "oklch(0.18 0.02 260)") : tk.textMuted,
+                             fontWeight: 600 }}>
+              <Icon name="List" size={14} /> {t("vitrine.viewList")}
             </button>
           </div>
-          <div className="flex items-center gap-2 font-mono text-[11px]" style={{ color: tk.textDim }}>
-            <Icon name="ArrowDownUp" size={12} /> {t("vitrine.sortBy")}
+          <div className="flex items-center gap-2 font-mono text-[13px]" style={{ color: tk.textDim }}>
+            <Icon name="ArrowDownUp" size={14} /> {t("vitrine.sortBy")}
           </div>
         </div>
       </div>

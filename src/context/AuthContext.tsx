@@ -64,7 +64,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!res.ok) return { success: false, error: data.error || 'Erro ao fazer login' };
       setUser(data.user);
       localStorage.setItem('keyvault-auth', JSON.stringify(data.user));
-      router.push('/');
+      // Hard reload so the static KEYFORGE SPA picks up the fresh auth on first paint.
+      window.location.href = '/';
       return { success: true };
     } catch {
       return { success: false, error: 'Erro de conexão' };
@@ -82,7 +83,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!res.ok) return { success: false, error: result.error || 'Erro ao criar conta' };
       setUser(result.user);
       localStorage.setItem('keyvault-auth', JSON.stringify(result.user));
-      router.push('/');
+      // Hard reload so the static KEYFORGE SPA picks up the fresh auth on first paint.
+      window.location.href = '/';
       return { success: true };
     } catch {
       return { success: false, error: 'Erro de conexão' };
