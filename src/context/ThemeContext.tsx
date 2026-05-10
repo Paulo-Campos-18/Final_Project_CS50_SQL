@@ -17,7 +17,9 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     setMounted(true);
-    const stored = localStorage.getItem('theme-mode') as Theme | null;
+    // Share the theme key with the Claude Design SPA (kf-theme) so the choice
+    // sticks across / (storefront) and /admin/* (Next.js admin).
+    const stored = (localStorage.getItem('kf-theme') || localStorage.getItem('theme-mode')) as Theme | null;
     if (stored) {
       setTheme(stored);
       document.documentElement.setAttribute('data-theme', stored);
@@ -32,6 +34,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     const newTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(newTheme);
     localStorage.setItem('theme-mode', newTheme);
+    localStorage.setItem('kf-theme', newTheme); // mirror to the SPA's key
     document.documentElement.setAttribute('data-theme', newTheme);
   };
 

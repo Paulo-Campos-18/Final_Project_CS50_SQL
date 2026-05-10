@@ -106,10 +106,10 @@ const AdminDashboard = ({ onOpenGame }) => {
             Sales & inventory control
           </h1>
           <p className="mt-2 max-w-[60ch]" style={{ color: t.textMuted }}>
-            Live view of <span className="font-mono text-[12px]" style={{ color: t.text }}>transactions</span>,{" "}
-            <span className="font-mono text-[12px]" style={{ color: t.text }}>orders</span>,{" "}
-            <span className="font-mono text-[12px]" style={{ color: t.text }}>keys</span> and{" "}
-            <span className="font-mono text-[12px]" style={{ color: t.text }}>key_batches</span> joined across the schema.
+            Visão ao vivo de <span className="font-mono text-[12px]" style={{ color: t.text }}>vendas</span>,{" "}
+            <span className="font-mono text-[12px]" style={{ color: t.text }}>pedidos</span>,{" "}
+            <span className="font-mono text-[12px]" style={{ color: t.text }}>chaves</span> e{" "}
+            <span className="font-mono text-[12px]" style={{ color: t.text }}>fornecedores</span>.
           </p>
         </div>
         <div className="flex items-center gap-1 rounded-xl p-1 border"
@@ -131,14 +131,14 @@ const AdminDashboard = ({ onOpenGame }) => {
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <KPI label="Revenue" value={fmtMoney(totalRevenue, currency)} delta={12.4} sub="vs prev period" icon="DollarSign" accent />
         <KPI label="Orders" value={totalOrders.toLocaleString()} delta={6.1} sub="completed" icon="ShoppingBag" />
-        <KPI label="Keys sold" value={totalKeys.toLocaleString()} delta={9.7} sub="status='Sold'" icon="Key" />
+        <KPI label="Keys sold" value={totalKeys.toLocaleString()} delta={9.7} sub="vendidas" icon="Key" />
         <KPI label="AOV" value={fmtMoney(aov, currency)} delta={-1.8} sub="avg order value" icon="Receipt" />
       </div>
 
       {/* charts row 1 */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-6">
         <div className="lg:col-span-2">
-          <Panel title="Revenue over time" subtitle={`SUM(transactions.total_price) · last ${days} days`}>
+          <Panel title="Revenue over time" subtitle={`receita por dia · últimos ${days} dias`}>
             <div className="h-[280px]">
               <RCa width="100%" height="100%">
                 <ACa data={series} margin={{ top: 8, right: 16, left: 0, bottom: 0 }}>
@@ -164,7 +164,7 @@ const AdminDashboard = ({ onOpenGame }) => {
           </Panel>
         </div>
         <div>
-          <Panel title="Inventory by status" subtitle="JOIN keys ⨝ key_status">
+          <Panel title="Inventory by status" subtitle="agrupado por status">
             <div className="h-[200px] relative">
               <RCa width="100%" height="100%">
                 <PCa>
@@ -200,7 +200,7 @@ const AdminDashboard = ({ onOpenGame }) => {
       {/* charts row 2 */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3 mb-6">
         <div className="lg:col-span-2">
-          <Panel title="Top games by revenue" subtitle="SUM(order_keys.unit_price) GROUP BY game_id">
+          <Panel title="Top games by revenue" subtitle="receita por jogo · agregada">
             <div className="h-[280px]">
               <RCa width="100%" height="100%">
                 <BCa data={top} layout="vertical" margin={{ top: 8, right: 16, left: 8, bottom: 0 }}>
@@ -218,7 +218,7 @@ const AdminDashboard = ({ onOpenGame }) => {
           </Panel>
         </div>
         <div>
-          <Panel title="Payment method mix" subtitle="GROUP BY payment_method_id">
+          <Panel title="Payment method mix" subtitle="por método">
             <div className="space-y-2 mt-2">
               {pmBreakdown.map((pm) => {
                 const total = pmBreakdown.reduce((a, b) => a + b.value, 0);
@@ -246,7 +246,7 @@ const AdminDashboard = ({ onOpenGame }) => {
 
       {/* per-game inventory table */}
       <div className="mb-6">
-        <Panel title="Stock per game" subtitle="keys GROUP BY game_id, key_status_id">
+        <Panel title="Stock per game" subtitle="estoque ativo por jogo">
           <div className="overflow-x-auto">
             <table className="w-full text-[12px]">
               <thead>
@@ -317,7 +317,7 @@ const AdminDashboard = ({ onOpenGame }) => {
 
       {/* recent orders + suppliers */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-        <Panel title="Recent orders" subtitle="orders ⨝ transactions ⨝ users · ORDER BY purchase_datetime DESC">
+        <Panel title="Recent orders" subtitle="últimos pedidos confirmados">
           <div className="overflow-x-auto">
             <table className="w-full text-[12px]">
               <thead>
@@ -358,7 +358,7 @@ const AdminDashboard = ({ onOpenGame }) => {
           </div>
         </Panel>
 
-        <Panel title="Suppliers" subtitle="suppliers ⨝ key_batches · GROUP BY supplier_id">
+        <Panel title="Suppliers" subtitle="volume por fornecedor">
           <div className="space-y-2">
             {supplierVolume.map((s) => {
               const plat = platformById(s.platform_id);
@@ -387,7 +387,7 @@ const AdminDashboard = ({ onOpenGame }) => {
       </div>
 
       <div className="mt-10 text-center font-mono text-[11px]" style={{ color: t.textDim }}>
-        Aggregated from transactions · orders · order_keys · keys · key_batches · suppliers · payment_method.
+        Agregado a partir do banco operacional.
       </div>
     </motion.div>
   );

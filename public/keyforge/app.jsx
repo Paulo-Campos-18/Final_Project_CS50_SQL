@@ -1093,7 +1093,7 @@ const Vitrine = ({ onOpen }) => {
         </div>
         <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-white/[0.04] border border-white/[0.06] font-mono text-[11px] text-white/65">
           <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "oklch(0.85 0.18 165)" }} />
-          1,983 keys live · status='Available'
+          1,983 chaves prontas
         </div>
       </div>
 

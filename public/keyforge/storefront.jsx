@@ -1,12 +1,32 @@
 // Storefront views: TopNav, Vitrine, GameCard
 const { useState: useStateSF, useEffect: useEffectSF, useMemo: useMemoSF } = React;
 
+// Reads the Next.js AuthContext payload that lives in localStorage under
+// "keyvault-auth". The KEYFORGE SPA itself is anonymous; admin gating just
+// looks for {role:"admin"} on that record.
+const readKeyvaultAuth = () => {
+  try {
+    const raw = typeof window !== "undefined" && localStorage.getItem("keyvault-auth");
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+};
+
 // ---------- Top nav ----------
 const TopNav = ({ view, route, onNavigate, onCartClick }) => {
   const { theme, setTheme, currency, setCurrency, language, setLanguage } = useApp();
   const tk = tokens(theme);
   const [profileOpen, setProfileOpen] = useStateSF(false);
+  const [authedUser, setAuthedUser] = useStateSF(null);
   const profileRef = React.useRef(null);
+
+  useEffectSF(() => {
+    setAuthedUser(readKeyvaultAuth());
+    const onStorage = (e) => { if (e.key === "keyvault-auth") setAuthedUser(readKeyvaultAuth()); };
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
+  const isAdmin = authedUser?.role === "admin";
 
   useEffectSF(() => {
     const onClick = (e) => {
@@ -41,10 +61,12 @@ const TopNav = ({ view, route, onNavigate, onCartClick }) => {
             <button key={it.key} onClick={() => onNavigate({ route: it.key })}
                     style={{ color: route === it.key ? tk.text : tk.textMuted }}>{it.label}</button>
           ))}
-          <button onClick={() => { window.location.href = "/admin/login"; }}
-                  style={{ color: route === "admin" ? tk.accent : tk.textMuted }}>
-            {t("nav.admin")}
-          </button>
+          {isAdmin && (
+            <button onClick={() => { window.location.href = "/admin"; }}
+                    style={{ color: route === "admin" ? tk.accent : tk.textMuted }}>
+              {t("nav.admin")}
+            </button>
+          )}
         </nav>
 
         <div className="flex items-center gap-3">
@@ -153,7 +175,9 @@ const TopNav = ({ view, route, onNavigate, onCartClick }) => {
                       { icon: "Heart",    label: t("profile.wishlist"), count: WISHLIST.filter((w) => w.user_id === 1).length },
                       { icon: "Library",  label: t("profile.library") },
                       { icon: "Receipt",  label: t("profile.orders") },
-                      { icon: "ShieldCheck", label: t("profile.admin"), action: () => { window.location.href = "/admin/login"; } },
+                      ...(isAdmin
+                        ? [{ icon: "ShieldCheck", label: t("profile.admin"), action: () => { window.location.href = "/admin"; } }]
+                        : []),
                     ].map((m) => (
                       <button key={m.label}
                               onClick={() => { setProfileOpen(false); m.action && m.action(); }}
@@ -532,12 +556,12 @@ const Vitrine = ({ onOpen }) => {
     const indie = byGenre("indie", GAMES);
     const strategy = byGenre("strategy", GAMES);
     return [
-      { title: "Em destaque", titleEn: "Featured", sub: "Top rated · ORDER BY rating DESC", list: featured },
+      { title: "Em destaque", titleEn: "Featured", sub: "melhores avaliados", list: featured },
       { title: "Em promoção", titleEn: "On sale", sub: "Maior queda vs. preço de pico", list: onSale },
-      { title: "Ação", titleEn: "Action", sub: "GAME ⨝ GENRE · 'action'", list: action },
-      { title: "RPG", titleEn: "RPG", sub: "GAME ⨝ GENRE · 'rpg'", list: rpg },
-      { title: "Indie", titleEn: "Indie", sub: "GAME ⨝ GENRE · 'indie'", list: indie },
-      { title: "Estratégia", titleEn: "Strategy", sub: "GAME ⨝ GENRE · 'strategy'", list: strategy },
+      { title: "Ação", titleEn: "Action", sub: "jogos de ação", list: action },
+      { title: "RPG", titleEn: "RPG", sub: "RPG", list: rpg },
+      { title: "Indie", titleEn: "Indie", sub: "indie", list: indie },
+      { title: "Estratégia", titleEn: "Strategy", sub: "estratégia", list: strategy },
     ].filter((r) => r.list.length > 0);
   }, [filter, filtered]);
 

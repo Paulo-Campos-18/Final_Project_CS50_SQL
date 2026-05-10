@@ -109,10 +109,11 @@ ORDER BY "total_keys" DESC, "sold_count" DESC;
 --Inserts
 INSERT INTO users ("first_name","last_name","nickname","email","password","amount","role")
 VALUES
-('Paulo','Campos','paulo_campos','paulo@gmail.com','123456', 450.50, 'admin'),
-('Emylly','Portela','Aiko','emylly@gmail.com','123456', 320.00, 'user'),
-('Pedro','Henrique','Pedroca','pedro@gmail.com','123456', 150.75, 'user'),
-('Marcela','Mafra','little_marcela','marcela@gmail.com','123456', 290.00, 'user');
+('Paulo','Campos','paulo_admin','paulo.admin@keyforge.dev','kf-admin-2026', 450.50, 'admin'),  -- id 1
+('Emylly','Portela','Aiko','emylly@gmail.com','123456', 320.00, 'user'),                       -- id 2
+('Pedro','Henrique','Pedroca','pedro@gmail.com','123456', 150.75, 'user'),                     -- id 3
+('Marcela','Mafra','little_marcela','marcela@gmail.com','123456', 290.00, 'user'),             -- id 4
+('Paulo','Campos','paulo','paulo.user@keyforge.dev','kf-user-2026', 320.00, 'user');           -- id 5 (regular)
 
 INSERT INTO genres ("name")
 VALUES

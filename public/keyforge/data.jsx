@@ -288,10 +288,15 @@ const GAMES = [
     features: ["Single-player", "Controller support", "Cloud saves", "60+ hours"], rawg_rating: 4.38, rawg_genres: ["Action", "Adventure", "Indie"] },
 ];
 
-// Build GAME_GENRES from each game's rawg_genres
+// Free-to-play games are removed from the storefront catalog (we don't sell
+// keys for them — they're just free downloads on their native stores).
+const FREE_GAME_IDS = new Set(GAMES.filter((g) => !g.price || g.price <= 0).map((g) => g.id));
+const PAID_GAMES = GAMES.filter((g) => !FREE_GAME_IDS.has(g.id));
+
+// Build GAME_GENRES from each game's rawg_genres (paid games only)
 const GAME_GENRES = (() => {
   const out = []; let id = 1;
-  for (const g of GAMES) {
+  for (const g of PAID_GAMES) {
     for (const gn of g.rawg_genres) {
       const gid = genreIdByName(gn);
       if (gid) out.push({ id: id++, game_id: g.id, genre_id: gid });
@@ -601,8 +606,12 @@ const fmtMoney = (usd, code = "USD") => {
 };
 
 // Expose to global scope for other Babel scripts
+// Only paid games are surfaced to the storefront. The full GAMES_ALL list is
+// kept on window for any internal admin tooling that wants to see the whole
+// catalog (free titles included).
 Object.assign(window, {
-  PLATFORMS, GENRES, KEY_STATUS, PAYMENT_METHODS, SUPPLIERS, GAMES, GAME_GENRES,
+  PLATFORMS, GENRES, KEY_STATUS, PAYMENT_METHODS, SUPPLIERS,
+  GAMES: PAID_GAMES, GAMES_ALL: GAMES, GAME_GENRES,
   PRICE_LOG, GAME_RATING_AGG, USERS, GAME_COMMENTS, WISHLIST, KEY_BATCHES,
   KEY_INVENTORY, ORDERS, ORDER_KEYS, TRANSACTIONS, DAILY_REVENUE,
   TOP_GAMES_REVENUE, INVENTORY_TOTALS, COVERS, CURRENCIES,
