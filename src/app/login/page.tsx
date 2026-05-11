@@ -93,7 +93,13 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div style={{ textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-muted)', marginTop: 16 }}>
+          <div style={{ textAlign: 'center', fontSize: '0.9rem', color: 'var(--text-secondary)', marginTop: 20 }}>
+            Não tem conta?{' '}
+            <Link href="/register" style={{ color: 'var(--accent-primary)', fontWeight: 600 }}>
+              Criar conta
+            </Link>
+          </div>
+          <div style={{ textAlign: 'center', fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 10 }}>
             É administrador?{' '}
             <Link href="/admin/login" style={{ color: 'var(--accent-primary)' }}>
               Painel administrativo
