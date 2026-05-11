@@ -313,7 +313,7 @@ const GameCard = ({ game, onOpen, dense = false }) => {
           : (theme === "light" ? "0 8px 24px -16px rgba(0,0,0,0.12)" : "0 8px 24px -12px rgba(0,0,0,0.5)"),
       }}
     >
-      <div className="relative aspect-[4/5] overflow-hidden shrink-0 rounded-t-2xl">
+      <div className="relative aspect-[2/3] overflow-hidden shrink-0 rounded-t-2xl">
         <motion.div className="absolute inset-0" animate={{ scale: hover && !soldOut ? 1.06 : 1 }} transition={{ duration: 0.6 }}>
           <CoverArt id={game.cover} image={game.image} title={game.name} platform={plat} theme={theme} compact={dense} />
         </motion.div>
@@ -482,7 +482,7 @@ const GameRow = ({ title, subtitle, games, onOpen }) => {
         <style>{`.row-scroll::-webkit-scrollbar { display: none }`}</style>
         {games.map((g) => (
           <div key={g.id} className="snap-start shrink-0 flex"
-               style={{ width: "calc((100% - 2 * 1rem) / 3)", minWidth: 280 }}>
+               style={{ width: "calc((100% - 3 * 1rem) / 4)", minWidth: 240 }}>
             <GameCard game={g} onOpen={onOpen} dense />
           </div>
         ))}
