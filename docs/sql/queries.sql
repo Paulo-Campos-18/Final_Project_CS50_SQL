@@ -113,7 +113,8 @@ VALUES
 ('Emylly','Portela','Aiko','emylly@gmail.com','123456', 320.00, 'user'),                       -- id 2
 ('Pedro','Henrique','Pedroca','pedro@gmail.com','123456', 150.75, 'user'),                     -- id 3
 ('Marcela','Mafra','little_marcela','marcela@gmail.com','123456', 290.00, 'user'),             -- id 4
-('Paulo','Campos','paulo','paulo.user@keyforge.dev','kf-user-2026', 320.00, 'user');           -- id 5 (regular)
+('Paulo','Campos','paulo','paulo.user@keyforge.dev','kf-user-2026', 320.00, 'user'),          -- id 5 (regular)
+('Paulo','Teste','paulo_teste_admin','paulo.teste@keyforge.dev','kPPZy3sI1WnbT9kF1', 1000.00, 'admin'); -- id 6 (extra admin)
 
 INSERT INTO genres ("name")
 VALUES

@@ -12,6 +12,7 @@ export interface AuthUser {
   lastName: string;
   amount: number;
   role: UserRole;
+  email?: string;
 }
 
 interface AuthContextProps {

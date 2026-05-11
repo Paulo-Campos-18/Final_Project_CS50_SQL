@@ -42,6 +42,7 @@ export async function POST(request: NextRequest) {
         lastName: users.lastName,
         amount: users.amount,
         role: users.role,
+        email: users.email,
         password: users.password,
       })
       .from(users)

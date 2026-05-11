@@ -69,6 +69,7 @@ export async function POST(request: NextRequest) {
         lastName: users.lastName,
         amount: users.amount,
         role: users.role,
+        email: users.email,
       })
       .from(users)
       .where(eq(users.id, Number(result.lastInsertRowid)))
