@@ -43,5 +43,24 @@ if (insertsText) {
   console.log('No inserts found in queries.sql.');
 }
 
+// 3. Hash any plain-text password seeded by queries.sql.
+// queries.sql ships with plain passwords for readability; we never want plain
+// in the DB at rest. bcryptjs is required regardless of TS/JS context.
+try {
+  const bcrypt = require('bcryptjs');
+  const rows = db.prepare('SELECT id, password FROM users').all();
+  const update = db.prepare('UPDATE users SET password = ? WHERE id = ?');
+  let migrated = 0;
+  for (const u of rows) {
+    if (typeof u.password === 'string' && u.password.startsWith('$2')) continue;
+    update.run(bcrypt.hashSync(u.password, 10), u.id);
+    migrated++;
+  }
+  console.log(`Passwords hashed: ${migrated}/${rows.length}`);
+} catch (e) {
+  console.error('Failed to hash seeded passwords:', e);
+  process.exit(1);
+}
+
 db.close();
 console.log('Done!');
