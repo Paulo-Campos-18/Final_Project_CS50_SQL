@@ -78,18 +78,18 @@ const CollapsibleSection = ({ title, subtitle, children, action, defaultOpen = t
 const TabBar = ({ tab, setTab, tabs }) => {
   const { theme } = useApp(); const t = tokens(theme);
   return (
-    <div className="rounded-xl p-1 border inline-flex flex-wrap gap-1 mb-6"
+    <div className="rounded-xl p-1.5 border inline-flex flex-wrap gap-1.5 mb-6"
          style={{ background: t.panelBg, borderColor: t.borderSoft }}>
       {tabs.map((opt) => {
         const on = tab === opt.id;
         return (
           <button key={opt.id} onClick={() => setTab(opt.id)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-mono text-[11px] tracking-wider transition"
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg font-mono text-[14px] tracking-wider font-semibold transition"
             style={{
               background: on ? t.accent : "transparent",
               color: on ? (theme === "light" ? "white" : "oklch(0.18 0.02 260)") : t.textMuted,
             }}>
-            {opt.icon && <Icon name={opt.icon} size={12} color={on ? (theme === "light" ? "white" : "oklch(0.18 0.02 260)") : t.textMuted} />}
+            {opt.icon && <Icon name={opt.icon} size={16} color={on ? (theme === "light" ? "white" : "oklch(0.18 0.02 260)") : t.textMuted} strokeWidth={2} />}
             {opt.label}
           </button>
         );
@@ -455,11 +455,11 @@ const AdminDashboard = ({ onOpenGame }) => {
       {/* header */}
       <div className="flex items-end justify-between flex-wrap gap-4 mb-6">
         <div>
-          <div className="flex items-center gap-2">
-            <div className="px-2 py-0.5 rounded-md font-mono text-[10px] tracking-[0.2em]" style={{ background: t.accentBg, color: t.accent }}>ADMIN</div>
-            <div className="font-mono text-[11px] tracking-[0.22em]" style={{ color: t.textDim }}>OPERATIONS · {tab.toUpperCase()}</div>
+          <div className="flex items-center gap-3">
+            <div className="px-2.5 py-1 rounded-md font-mono text-[12px] tracking-[0.2em] font-semibold" style={{ background: t.accentBg, color: t.accent }}>ADMIN</div>
+            <div className="font-mono text-[13px] tracking-[0.22em]" style={{ color: t.textDim }}>OPERATIONS · {tab.toUpperCase()}</div>
           </div>
-          <h1 className="mt-2 font-display text-[36px] leading-[1.1] font-semibold" style={{ color: t.text }}>
+          <h1 className="mt-3 font-display text-[44px] leading-[1.05] font-semibold" style={{ color: t.text }}>
             {tab === "overview"  && "System overview"}
             {tab === "sales"     && "Sales analytics"}
             {tab === "inventory" && "Inventory control"}
@@ -468,7 +468,7 @@ const AdminDashboard = ({ onOpenGame }) => {
             {tab === "suppliers" && "Suppliers & procurement"}
             {tab === "settings"  && "System settings"}
           </h1>
-          <p className="mt-2 max-w-[60ch]" style={{ color: t.textMuted }}>
+          <p className="mt-3 max-w-[60ch] text-[16px] leading-relaxed" style={{ color: t.textMuted }}>
             {tab === "overview"  && "High-level health of revenue, inventory, accounts and procurement."}
             {tab === "sales"     && "Daily revenue, payment mix, top sellers and recent orders."}
             {tab === "inventory" && "Per-game stock, key batches and status distribution."}
