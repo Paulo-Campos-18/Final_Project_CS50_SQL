@@ -676,12 +676,12 @@ const Vitrine = ({ onOpen }) => {
         </div>
       </div>
 
-      <div className="mb-8 flex items-center gap-2 flex-wrap">
+      <div className="mb-8 flex items-center gap-2.5 flex-wrap">
         {platformOpts.map((p) => {
           const label = p === "All" ? t("vitrine.filterAll") : p;
           return (
             <button key={p} onClick={() => setFilter(p)}
-                    className="px-3 py-1.5 rounded-lg font-mono text-[11px] tracking-wider transition border"
+                    className="kf-glow px-4 py-2.5 rounded-lg font-mono text-[13px] tracking-wider font-semibold transition border"
                     style={{
                       background: filter === p ? tk.text : "transparent",
                       color: filter === p ? tk.pageBg : tk.textMuted,
@@ -691,23 +691,23 @@ const Vitrine = ({ onOpen }) => {
             </button>
           );
         })}
-        <div className="ml-auto flex items-center gap-2">
-          <div className="flex items-center gap-1 p-0.5 rounded-lg border" style={{ borderColor: tk.borderSoft, background: theme === "light" ? tk.elevBg : "rgba(255,255,255,0.04)" }}>
+        <div className="ml-auto flex items-center gap-3">
+          <div className="flex items-center gap-1.5 p-1 rounded-lg border" style={{ borderColor: tk.borderSoft, background: theme === "light" ? tk.elevBg : "rgba(255,255,255,0.04)" }}>
             <button onClick={() => setLayout("grid")}
-                    className="px-2.5 py-1 rounded-md font-mono text-[10px] tracking-wider flex items-center gap-1.5 transition"
+                    className="px-3.5 py-2 rounded-md font-mono text-[12px] tracking-wider font-semibold flex items-center gap-2 transition"
                     style={{ background: layout === "grid" ? tk.accent : "transparent",
                              color: layout === "grid" ? (theme === "light" ? "white" : "oklch(0.18 0.02 260)") : tk.textMuted }}>
-              <Icon name="LayoutGrid" size={11} /> {t("vitrine.viewGrid")}
+              <Icon name="LayoutGrid" size={15} strokeWidth={2} /> {t("vitrine.viewGrid")}
             </button>
             <button onClick={() => setLayout("list")}
-                    className="px-2.5 py-1 rounded-md font-mono text-[10px] tracking-wider flex items-center gap-1.5 transition"
+                    className="px-3.5 py-2 rounded-md font-mono text-[12px] tracking-wider font-semibold flex items-center gap-2 transition"
                     style={{ background: layout === "list" ? tk.accent : "transparent",
                              color: layout === "list" ? (theme === "light" ? "white" : "oklch(0.18 0.02 260)") : tk.textMuted }}>
-              <Icon name="List" size={11} /> {t("vitrine.viewList")}
+              <Icon name="List" size={15} strokeWidth={2} /> {t("vitrine.viewList")}
             </button>
           </div>
-          <div className="flex items-center gap-2 font-mono text-[11px]" style={{ color: tk.textDim }}>
-            <Icon name="ArrowDownUp" size={12} /> {t("vitrine.sortBy")}
+          <div className="flex items-center gap-2 font-mono text-[13px]" style={{ color: tk.textDim }}>
+            <Icon name="ArrowDownUp" size={15} /> {t("vitrine.sortBy")}
           </div>
         </div>
       </div>
