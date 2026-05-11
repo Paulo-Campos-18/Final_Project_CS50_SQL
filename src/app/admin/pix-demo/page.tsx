@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import AdminGuard from '@/components/AdminGuard';
 
 interface ChargeResponse {
@@ -12,7 +12,15 @@ interface ChargeResponse {
   reconciliation: string;
 }
 
+interface StoreConfig {
+  keyLocked: boolean;
+  merchantName: string;
+  merchantCity: string;
+  maskedKey: string | null;
+}
+
 export default function PixDemoPage() {
+  const [config, setConfig] = useState<StoreConfig | null>(null);
   const [pixKey, setPixKey] = useState('');
   const [amount, setAmount] = useState('39.99');
   const [description, setDescription] = useState('Compra de chave KEYFORGE');
@@ -21,6 +29,13 @@ export default function PixDemoPage() {
   const [loading, setLoading] = useState(false);
   const [copied, setCopied] = useState(false);
 
+  useEffect(() => {
+    fetch('/api/pix/charge')
+      .then((r) => r.json())
+      .then(setConfig)
+      .catch(() => setConfig({ keyLocked: false, merchantName: 'KEYFORGE', merchantCity: 'CUIABA', maskedKey: null }));
+  }, []);
+
   const generate = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -28,15 +43,17 @@ export default function PixDemoPage() {
     setLoading(true);
     try {
       const txId = `KFG${Date.now().toString().slice(-10)}`;
+      const body: Record<string, unknown> = {
+        amount: Number(amount),
+        txId,
+        description,
+      };
+      // Only send pixKey when the store hasn't locked one via env.
+      if (!config?.keyLocked) body.pixKey = pixKey;
       const res = await fetch('/api/pix/charge', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          pixKey,
-          amount: Number(amount),
-          txId,
-          description,
-        }),
+        body: JSON.stringify(body),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -97,17 +114,59 @@ export default function PixDemoPage() {
                 boxShadow: 'var(--shadow-md)',
               }}
             >
-              <label style={labelStyle}>
-                Chave PIX (CPF / CNPJ / email / telefone / aleatória)
-                <input
-                  type="text"
-                  value={pixKey}
-                  onChange={(e) => setPixKey(e.target.value)}
-                  placeholder="ex: 123.456.789-09 ou loja@keyforge.com"
-                  required
-                  style={fieldStyle}
-                />
-              </label>
+              {config?.keyLocked ? (
+                <div
+                  style={{
+                    padding: '12px 14px',
+                    borderRadius: 'var(--radius-sm)',
+                    border: '1px solid var(--accent-primary)',
+                    background: 'var(--bg-glass)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 12,
+                  }}
+                >
+                  <span style={{ fontSize: '1.2rem' }}>🔒</span>
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <div
+                      style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '0.62rem',
+                        letterSpacing: '0.18em',
+                        color: 'var(--text-muted)',
+                      }}
+                    >
+                      CHAVE PIX DA LOJA · CONFIGURADA VIA <code>.env.local</code>
+                    </div>
+                    <div
+                      style={{
+                        fontFamily: 'var(--font-mono)',
+                        fontSize: '0.95rem',
+                        fontWeight: 600,
+                        color: 'var(--accent-primary)',
+                        marginTop: 2,
+                      }}
+                    >
+                      {config.maskedKey}
+                    </div>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: 2 }}>
+                      {config.merchantName} · {config.merchantCity}
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <label style={labelStyle}>
+                  Chave PIX (CPF / CNPJ / email / telefone / aleatória)
+                  <input
+                    type="text"
+                    value={pixKey}
+                    onChange={(e) => setPixKey(e.target.value)}
+                    placeholder="ex: 123.456.789-09 ou loja@keyforge.com"
+                    required
+                    style={fieldStyle}
+                  />
+                </label>
+              )}
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 12 }}>
                 <label style={labelStyle}>
