@@ -45,18 +45,18 @@ const TopNav = ({ view, route, onNavigate, onCartClick }) => {
   return (
     <header className="sticky top-0 z-30 backdrop-blur-xl border-b"
             style={{ background: tk.navBg, borderColor: tk.borderSoft }}>
-      <div className="max-w-[1280px] mx-auto px-6 lg:px-10 h-14 flex items-center justify-between">
-        <button onClick={() => onNavigate({ route: "store" })} className="flex items-center gap-2.5">
-          <div className="w-7 h-7 rounded-md flex items-center justify-center" style={{ background: tk.accent }}>
-            <Icon name="Key" size={14} color={theme === "light" ? "white" : "oklch(0.18 0.02 260)"} strokeWidth={2.5} />
+      <div className="max-w-[1280px] mx-auto px-6 lg:px-10 h-[72px] flex items-center justify-between">
+        <button onClick={() => onNavigate({ route: "store" })} className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: tk.accent }}>
+            <Icon name="Key" size={18} color={theme === "light" ? "white" : "oklch(0.18 0.02 260)"} strokeWidth={2.5} />
           </div>
           <div className="text-left">
-            <div className="font-display font-semibold text-[15px] leading-none tracking-tight" style={{ color: tk.text }}>KEYFORGE</div>
-            <div className="font-mono text-[9px] tracking-[0.2em] mt-0.5" style={{ color: tk.textDim }}>DIGITAL KEY VAULT</div>
+            <div className="font-display font-semibold text-[19px] leading-none tracking-tight" style={{ color: tk.text }}>KEYFORGE</div>
+            <div className="font-mono text-[10px] tracking-[0.22em] mt-1" style={{ color: tk.textDim }}>DIGITAL KEY VAULT</div>
           </div>
         </button>
 
-        <nav className="hidden md:flex items-center gap-6 font-mono text-[11px] tracking-[0.16em]">
+        <nav className="hidden md:flex items-center gap-7 font-mono text-[14px] tracking-[0.16em]">
           {navItems.map((it) => (
             <button key={it.key} onClick={() => onNavigate({ route: it.key })}
                     className="kf-glow-text"
@@ -73,22 +73,22 @@ const TopNav = ({ view, route, onNavigate, onCartClick }) => {
 
         <div className="flex items-center gap-3">
           <button onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                  className="kf-glow w-8 h-8 rounded-lg flex items-center justify-center border transition"
+                  className="kf-glow w-10 h-10 rounded-lg flex items-center justify-center border transition"
                   style={{ background: theme === "light" ? tk.elevBg : "rgba(255,255,255,0.04)", borderColor: tk.borderSoft }}
                   title={theme === "light" ? t("nav.themeToDark") : t("nav.themeToLight")}>
-            <Icon name={theme === "light" ? "Moon" : "Sun"} size={14} color={tk.textMuted} />
+            <Icon name={theme === "light" ? "Moon" : "Sun"} size={17} color={tk.textMuted} />
           </button>
 
-          <button className="kf-glow hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[12px]"
+          <button className="kf-glow hidden sm:flex items-center gap-2.5 px-4 py-2 rounded-lg border text-[14px]"
                   style={{ background: theme === "light" ? tk.elevBg : "rgba(255,255,255,0.04)", borderColor: tk.borderSoft, color: tk.textMuted }}>
-            <Icon name="Search" size={13} /> {t("nav.search")}
+            <Icon name="Search" size={16} /> {t("nav.search")}
           </button>
 
           {onCartClick && <CartButton onClick={onCartClick} />}
 
           {!authedUser ? (
             <a href="/login"
-               className="kf-glow px-3.5 py-1.5 rounded-lg font-mono text-[11px] tracking-[0.16em] transition"
+               className="kf-glow px-4 py-2 rounded-lg font-mono text-[13px] tracking-[0.16em] transition"
                style={{
                  background: tk.accent,
                  color: theme === "light" ? "white" : "oklch(0.18 0.02 260)",
@@ -100,13 +100,13 @@ const TopNav = ({ view, route, onNavigate, onCartClick }) => {
           ) : (
           <div className="relative" ref={profileRef}>
             <button onClick={() => setProfileOpen((o) => !o)}
-                    className="kf-glow w-8 h-8 rounded-full flex items-center justify-center border-2 transition relative"
+                    className="kf-glow w-10 h-10 rounded-full flex items-center justify-center border-2 transition relative"
                     style={{ background: "linear-gradient(135deg, oklch(0.85 0.18 165), oklch(0.65 0.16 220))",
                              borderColor: profileOpen ? tk.accent : "transparent" }}>
-              <span className="font-display font-semibold text-[12px]" style={{ color: "oklch(0.18 0.02 260)" }}>
+              <span className="font-display font-semibold text-[14px]" style={{ color: "oklch(0.18 0.02 260)" }}>
                 {(authedUser.firstName?.[0] || "U").toUpperCase()}
               </span>
-              <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full font-mono text-[7px] flex items-center justify-center font-bold"
+              <span className="absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full font-mono text-[8px] flex items-center justify-center font-bold"
                     style={{ background: tk.panelBg, color: tk.text, border: `1px solid ${tk.border}` }}>
                 {CURRENCIES[currency].symbol}
               </span>
@@ -346,17 +346,17 @@ const GameCard = ({ game, onOpen, dense = false }) => {
         </AnimatePresence>
       </div>
 
-      <div className={cls("relative flex-1", dense ? "p-2.5" : "p-4 pt-3.5")}>
-        <div className="flex items-start justify-between gap-2">
+      <div className={cls("relative flex-1", dense ? "p-3.5" : "p-5 pt-4")}>
+        <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <div className="font-mono text-[9px] tracking-[0.18em] uppercase truncate" style={{ color: tk.textDim }}>{game.studio}</div>
-            <div className={cls("font-display font-medium truncate mt-0.5", dense ? "text-[13px]" : "text-[15px]")} style={{ color: tk.text }}>{game.name}</div>
+            <div className="font-mono text-[10px] tracking-[0.18em] uppercase truncate" style={{ color: tk.textDim }}>{game.studio}</div>
+            <div className={cls("font-display font-semibold truncate mt-1", dense ? "text-[16px]" : "text-[19px]")} style={{ color: tk.text }}>{game.name}</div>
           </div>
           <div className="text-right shrink-0">
             {msrp > game.price && (
-              <div className="font-mono text-[9px] line-through tabular-nums" style={{ color: tk.textDim }}>{fmtMoney(msrp, currency)}</div>
+              <div className="font-mono text-[11px] line-through tabular-nums" style={{ color: tk.textDim }}>{fmtMoney(msrp, currency)}</div>
             )}
-            <div className={cls("font-display font-semibold tabular-nums", dense ? "text-[14px]" : "text-[16px]")} style={{ color: tk.accent }}>
+            <div className={cls("font-display font-bold tabular-nums", dense ? "text-[17px]" : "text-[20px]")} style={{ color: tk.accent }}>
               {fmtMoney(game.price, currency)}
             </div>
           </div>
@@ -482,7 +482,7 @@ const GameRow = ({ title, subtitle, games, onOpen }) => {
         <style>{`.row-scroll::-webkit-scrollbar { display: none }`}</style>
         {games.map((g) => (
           <div key={g.id} className="snap-start shrink-0 flex"
-               style={{ width: "calc((100% - 3 * 1rem) / 4)", minWidth: 220 }}>
+               style={{ width: "calc((100% - 2 * 1rem) / 3)", minWidth: 280 }}>
             <GameCard game={g} onOpen={onOpen} dense />
           </div>
         ))}
