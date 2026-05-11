@@ -4,7 +4,7 @@ import { games, platforms, gameRating, gameGenres, genres, gamePriceLog } from '
 import { eq, sql, avg } from 'drizzle-orm';
 import { cookies } from 'next/headers';
 import { getDictionary } from '@/i18n';
-import GameCard from '@/components/GameCard';
+import DealsGrid from './DealsGrid';
 
 export const metadata: Metadata = {
   title: 'Promoções — KEYFORGE',
@@ -212,22 +212,21 @@ export default async function DealsPage() {
           )}
 
           {rest.length > 0 ? (
-            <div className="game-grid">
-              {rest.map((g) => (
-                <GameCard
-                  key={g.id}
-                  id={g.id}
-                  name={g.name}
-                  studio={g.studio}
-                  price={g.price}
-                  platform={g.platform}
-                  rating={g.avgRating}
-                  genres={g.genres}
-                  coverImageUrl={g.coverImageUrl}
-                  tagline={g.tagline}
-                />
-              ))}
-            </div>
+            <DealsGrid
+              lang={lang}
+              cards={rest.map((g) => ({
+                id: g.id,
+                name: g.name,
+                studio: g.studio,
+                price: g.price,
+                platform: g.platform,
+                coverImageUrl: g.coverImageUrl,
+                tagline: g.tagline,
+                avgRating: g.avgRating,
+                msrp: g.msrp ?? null,
+                genres: g.genres,
+              }))}
+            />
           ) : (
             <div className="empty-state">
               <div className="empty-state-icon">🛒</div>
