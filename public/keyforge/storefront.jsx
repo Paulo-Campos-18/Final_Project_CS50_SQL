@@ -11,6 +11,70 @@ const readKeyvaultAuth = () => {
   } catch { return null; }
 };
 
+// ---------- Collapsible picker (button shows current → click expands list) ----------
+const CollapsiblePicker = ({ label, options, active, onPick, renderOption, theme, tk }) => {
+  const [open, setOpen] = useStateSF(false);
+  const current = options.find((o) => (renderOption(o).key) === active) || options[0];
+  const currentMeta = renderOption(current);
+
+  return (
+    <div className="p-3 pb-2">
+      <div className="font-mono text-[10px] tracking-[0.18em] mb-2 px-1" style={{ color: tk.textDim }}>{label}</div>
+
+      {/* Selected button — click to expand */}
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg border transition text-left"
+        style={{
+          background: theme === "light" ? tk.elevBg : "rgba(255,255,255,0.04)",
+          borderColor: open ? tk.accent : tk.borderSoft,
+        }}
+      >
+        <span className="text-[18px] leading-none">{currentMeta.flag}</span>
+        <div className="min-w-0 flex-1">
+          <div className="font-mono text-[12px] font-semibold leading-tight" style={{ color: tk.text }}>{currentMeta.primary}</div>
+          <div className="font-mono text-[10px] leading-tight truncate" style={{ color: tk.textDim }}>{currentMeta.secondary}</div>
+        </div>
+        <Icon name={open ? "ChevronUp" : "ChevronDown"} size={14} color={tk.textMuted} />
+      </button>
+
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0, marginTop: 0 }}
+            animate={{ height: "auto", opacity: 1, marginTop: 6 }}
+            exit={{ height: 0, opacity: 0, marginTop: 0 }}
+            transition={{ duration: 0.2, ease: [0.22, 0.61, 0.36, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="flex flex-col gap-1 p-1 rounded-lg border" style={{ borderColor: tk.borderSoft, background: theme === "light" ? tk.elevBg : "rgba(255,255,255,0.02)" }}>
+              {options.map((o) => {
+                const meta = renderOption(o);
+                const isActive = meta.key === active;
+                return (
+                  <button key={meta.key}
+                          onClick={() => { onPick(meta.key); setOpen(false); }}
+                          className="flex items-center gap-2 px-2.5 py-2 rounded-md transition text-left"
+                          style={{
+                            background: isActive ? tk.accentBg : "transparent",
+                          }}>
+                    <span className="text-[15px] leading-none">{meta.flag}</span>
+                    <div className="min-w-0 flex-1">
+                      <div className="font-mono text-[11px] font-semibold leading-tight" style={{ color: isActive ? tk.accent : tk.text }}>{meta.primary}</div>
+                      <div className="font-mono text-[9px] leading-tight truncate" style={{ color: tk.textDim }}>{meta.secondary}</div>
+                    </div>
+                    {isActive && <Icon name="Check" size={12} color={tk.accent} />}
+                  </button>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
+
 // ---------- Top nav ----------
 const TopNav = ({ view, route, onNavigate, onCartClick }) => {
   const { theme, setTheme, currency, setCurrency, language, setLanguage } = useApp();
@@ -147,55 +211,27 @@ const TopNav = ({ view, route, onNavigate, onCartClick }) => {
                     </div>
                   </div>
 
-                  {/* language selector */}
-                  <div className="p-3 pb-2">
-                    <div className="font-mono text-[10px] tracking-[0.18em] mb-2 px-1" style={{ color: tk.textDim }}>{t("profile.language")}</div>
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {Object.values(LANGUAGES).map((L) => {
-                        const active = language === L.code;
-                        return (
-                          <button key={L.code} onClick={() => setLanguage(L.code)}
-                                  className="flex items-center gap-2 px-2.5 py-2 rounded-lg border transition text-left"
-                                  style={{
-                                    background: active ? tk.accentBg : (theme === "light" ? tk.elevBg : "rgba(255,255,255,0.03)"),
-                                    borderColor: active ? tk.accent : tk.borderSoft,
-                                  }}>
-                            <span className="text-[16px] leading-none">{L.flag}</span>
-                            <div className="min-w-0 flex-1">
-                              <div className="font-mono text-[11px] font-semibold leading-tight" style={{ color: active ? tk.accent : tk.text }}>{L.short}</div>
-                              <div className="font-mono text-[9px] leading-tight truncate" style={{ color: tk.textDim }}>{L.label}</div>
-                            </div>
-                            {active && <Icon name="Check" size={12} color={tk.accent} />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
+                  {/* language selector (collapsible) */}
+                  <CollapsiblePicker
+                    label={t("profile.language")}
+                    options={Object.values(LANGUAGES)}
+                    active={language}
+                    onPick={setLanguage}
+                    renderOption={(L) => ({ flag: L.flag, primary: L.short, secondary: L.label, key: L.code })}
+                    theme={theme}
+                    tk={tk}
+                  />
 
-                  {/* currency selector */}
-                  <div className="p-3 pt-2">
-                    <div className="font-mono text-[10px] tracking-[0.18em] mb-2 px-1" style={{ color: tk.textDim }}>{t("profile.currency")}</div>
-                    <div className="grid grid-cols-2 gap-1.5">
-                      {Object.values(CURRENCIES).map((c) => {
-                        const active = currency === c.code;
-                        return (
-                          <button key={c.code} onClick={() => { setCurrency(c.code); }}
-                                  className="flex items-center gap-2 px-2.5 py-2 rounded-lg border transition text-left"
-                                  style={{
-                                    background: active ? tk.accentBg : (theme === "light" ? tk.elevBg : "rgba(255,255,255,0.03)"),
-                                    borderColor: active ? tk.accent : tk.borderSoft,
-                                  }}>
-                            <span className="text-[16px] leading-none">{c.flag}</span>
-                            <div className="min-w-0">
-                              <div className="font-mono text-[11px] font-semibold leading-tight" style={{ color: active ? tk.accent : tk.text }}>{c.code}</div>
-                              <div className="font-mono text-[9px] leading-tight truncate" style={{ color: tk.textDim }}>{c.symbol} · {c.rate.toFixed(2)}</div>
-                            </div>
-                            {active && <Icon name="Check" size={12} color={tk.accent} className="ml-auto" />}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
+                  {/* currency selector (collapsible) */}
+                  <CollapsiblePicker
+                    label={t("profile.currency")}
+                    options={Object.values(CURRENCIES)}
+                    active={currency}
+                    onPick={setCurrency}
+                    renderOption={(c) => ({ flag: c.flag, primary: c.code, secondary: `${c.symbol} · ${c.rate.toFixed(2)}`, key: c.code })}
+                    theme={theme}
+                    tk={tk}
+                  />
 
                   <div className="p-2 border-t" style={{ borderColor: tk.borderSoft }}>
                     {[

@@ -8,6 +8,17 @@ import { useTheme } from '@/context/ThemeContext';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useCurrency, CURRENCIES, CurrencyCode } from '@/context/CurrencyContext';
+import {
+  Key as KeyIcon,
+  Sun,
+  Moon,
+  ShoppingCart,
+  Search,
+  Languages,
+  LogOut as LogOutIcon,
+  User as UserIcon,
+  ChevronDown,
+} from 'lucide-react';
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -162,18 +173,42 @@ export default function Navbar() {
     <>
       <nav className="navbar" id="main-navbar">
         <div className="navbar-inner">
-          <Link href="/" className="navbar-logo">
-            <div className="navbar-logo-icon">🔑</div>
+          <Link href="/" className="navbar-logo kf-glow-text" style={{ textDecoration: 'none' }}>
+            <div
+              className="navbar-logo-icon"
+              style={{
+                width: 36, height: 36, borderRadius: 8,
+                background: 'var(--accent-primary)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}
+            >
+              <KeyIcon size={18} strokeWidth={2.5} color={theme === 'light' ? 'white' : 'oklch(0.18 0.02 260)'} />
+            </div>
             <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
-              <span style={{ fontFamily: 'var(--font-display)', fontWeight: 600, letterSpacing: '0.01em' }}>KEYFORGE</span>
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.55rem', letterSpacing: '0.22em', color: 'var(--text-muted)', marginTop: 2 }}>DIGITAL KEY VAULT</span>
+              <span style={{
+                fontFamily: 'var(--font-display)', fontWeight: 600, fontSize: '1.18rem',
+                letterSpacing: '-0.01em',
+                background: 'none', WebkitTextFillColor: 'currentColor', color: 'var(--text-primary)',
+              }}>KEYFORGE</span>
+              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.62rem', letterSpacing: '0.22em', color: 'var(--text-muted)', marginTop: 4 }}>
+                DIGITAL KEY VAULT
+              </span>
             </div>
           </Link>
 
-          <ul className="navbar-links">
+          <ul className="navbar-links" style={{ gap: 28 }}>
             {links.map((link) => (
               <li key={link.href}>
-                <Link href={link.href} className={pathname === link.href ? 'active' : ''}>
+                <Link
+                  href={link.href}
+                  className={`kf-glow-text ${pathname === link.href ? 'active' : ''}`}
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '0.88rem',
+                    letterSpacing: '0.18em',
+                    textTransform: 'uppercase',
+                  }}
+                >
                   {link.label}
                 </Link>
               </li>
@@ -183,19 +218,44 @@ export default function Navbar() {
           <div className="navbar-actions" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button
               onClick={toggleLanguage}
-              className="btn btn-outline"
-              style={{ padding: '8px', borderRadius: 'var(--radius-sm)', background: 'var(--bg-glass)', border: '1px solid var(--border-color)', fontSize: '1rem', width: '40px', display: 'flex', justifyContent: 'center' }}
+              className="kf-glow"
+              style={{
+                width: 40, height: 40, padding: 0,
+                borderRadius: 'var(--radius-sm)',
+                background: theme === 'light' ? 'var(--bg-glass)' : 'rgba(255,255,255,0.04)',
+                border: '1px solid var(--border-color)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer',
+                color: 'var(--text-muted)',
+                position: 'relative',
+              }}
               title={t('langToggle')}
             >
-              {language === 'pt-BR' ? '🇧🇷' : '🇺🇸'}
+              <Languages size={17} />
+              <span style={{
+                position: 'absolute', bottom: 2, right: 4,
+                fontFamily: 'var(--font-mono)', fontSize: '0.55rem',
+                color: 'var(--accent-primary)', fontWeight: 700,
+                letterSpacing: '0.05em',
+              }}>
+                {language === 'pt-BR' ? 'PT' : 'EN'}
+              </span>
             </button>
             <button
               onClick={toggleTheme}
-              className="btn btn-outline"
-              style={{ padding: '8px', borderRadius: 'var(--radius-sm)', background: 'var(--bg-glass)', border: '1px solid var(--border-color)', width: '40px', display: 'flex', justifyContent: 'center' }}
+              className="kf-glow"
+              style={{
+                width: 40, height: 40, padding: 0,
+                borderRadius: 'var(--radius-sm)',
+                background: theme === 'light' ? 'var(--bg-glass)' : 'rgba(255,255,255,0.04)',
+                border: '1px solid var(--border-color)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer',
+                color: 'var(--text-muted)',
+              }}
               title={theme === 'dark' ? t('themeLight') : t('themeDark')}
             >
-              {theme === 'dark' ? '☀️' : '🌙'}
+              {theme === 'dark' ? <Sun size={17} /> : <Moon size={17} />}
             </button>
 
             {user ? (
@@ -287,22 +347,24 @@ export default function Navbar() {
                     <div style={{ height: '1px', background: 'var(--border-color)', margin: '8px 0 4px' }} />
 
                     {[
-                      { label: `👤 ${t('myProfile')}`, href: '/profile' },
-                      { label: `🔑 ${t('myKeys')}`, href: '/my-keys' },
-                      { label: `👥 ${t('friends')}`, href: '/friends' },
+                      { icon: <UserIcon size={15} />, label: t('myProfile'), href: '/profile' },
+                      { icon: <KeyIcon size={15} />, label: t('myKeys'),    href: '/my-keys' },
+                      { icon: <UserIcon size={15} />, label: t('friends'),  href: '/friends' },
                     ].map((item) => (
                       <Link
                         key={item.href}
                         href={item.href}
                         onClick={() => setShowUserMenu(false)}
                         style={{
-                          display: 'block', padding: '10px 16px', fontSize: '0.88rem',
+                          display: 'flex', alignItems: 'center', gap: 10,
+                          padding: '10px 16px', fontSize: '0.88rem',
                           color: 'var(--text-primary)', textDecoration: 'none',
                           transition: 'background 0.15s',
                         }}
                         onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-tertiary)')}
                         onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                       >
+                        <span style={{ color: 'var(--text-muted)', display: 'inline-flex' }}>{item.icon}</span>
                         {item.label}
                       </Link>
                     ))}
@@ -317,7 +379,8 @@ export default function Navbar() {
                       onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--bg-tertiary)')}
                       onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                     >
-                      ✏️ {t('editProfile')}
+                      <UserIcon size={14} style={{ marginRight: 8, display: 'inline-block', verticalAlign: '-2px' }} />
+                      {t('editProfile')}
                     </button>
                     <div style={{ height: '1px', background: 'var(--border-color)', margin: '4px 0' }} />
                     <button
@@ -331,11 +394,7 @@ export default function Navbar() {
                       onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(239,68,68,0.1)')}
                       onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
                     >
-                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                        <polyline points="16 17 21 12 16 7"></polyline>
-                        <line x1="21" y1="12" x2="9" y2="12"></line>
-                      </svg>
+                      <LogOutIcon size={15} />
                       {t('logout')}
                     </button>
                   </div>
@@ -348,18 +407,28 @@ export default function Navbar() {
             )}
 
             <button
-              className="cart-toggle-btn btn btn-outline"
+              className="cart-toggle-btn kf-glow"
               onClick={() => setIsCartOpen(true)}
-              style={{ position: 'relative', padding: '8px 12px', borderRadius: 'var(--radius-sm)' }}
+              style={{
+                position: 'relative',
+                width: 40, height: 40, padding: 0,
+                borderRadius: 'var(--radius-sm)',
+                background: theme === 'light' ? 'var(--bg-glass)' : 'rgba(255,255,255,0.04)',
+                border: '1px solid var(--border-color)',
+                color: 'var(--text-muted)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                cursor: 'pointer',
+              }}
+              title="Carrinho"
             >
-              🛒
+              <ShoppingCart size={17} />
               {cartCount > 0 && (
                 <span style={{
                   position: 'absolute', top: '-6px', right: '-8px',
-                  background: 'var(--accent-primary)', color: 'white',
+                  background: 'var(--accent-primary)', color: 'oklch(0.18 0.02 260)',
                   borderRadius: '50%', width: '20px', height: '20px',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: '0.7rem', fontWeight: 'bold'
+                  fontSize: '0.7rem', fontWeight: 'bold',
                 }}>
                   {cartCount}
                 </span>
@@ -495,8 +564,13 @@ export default function Navbar() {
             borderRadius: 'var(--radius-xl)', padding: '40px', width: '100%', maxWidth: '420px',
             boxShadow: 'var(--shadow-lg)',
           }}>
-            <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: '1.3rem', fontWeight: '700', marginBottom: '24px', textAlign: 'center' }}>
-              ✏️ {t('editProfile')}
+            <h2 style={{
+              fontFamily: 'var(--font-heading)', fontSize: '1.3rem', fontWeight: '700',
+              marginBottom: '24px', textAlign: 'center',
+              display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8,
+            }}>
+              <UserIcon size={18} />
+              {t('editProfile')}
             </h2>
             <form onSubmit={handleEditProfile} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div>
