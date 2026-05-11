@@ -174,7 +174,10 @@ const SiteBackground = () => {
     resize();
     window.addEventListener("resize", resize);
     return () => window.removeEventListener("resize", resize);
-  }, [settings.enabled, settings.style]);
+    // density triggers a particle re-init (changes the count baked into the
+    // array). intensity / speed / customColor are read live inside the animation
+    // loop and only need to be in the loop effect's deps, not here.
+  }, [settings.enabled, settings.style, settings.density]);
 
   // Animation loop
   useEffectBG(() => {
@@ -378,7 +381,7 @@ const SiteBackground = () => {
     };
     st.raf = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(st.raf);
-  }, [settings.enabled, settings.style, settings.reactToMouse, settings.reactToScroll, settings.intensity, theme]);
+  }, [settings.enabled, settings.style, settings.reactToMouse, settings.reactToScroll, settings.intensity, settings.speed, settings.customColor, theme]);
 
   if (!settings.enabled) return null;
   const isFront = settings.layer === "front";
