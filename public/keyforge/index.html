@@ -32,6 +32,73 @@
   ::selection { background: oklch(0.85 0.18 165 / 0.35); color: white; }
   /* recharts axis tick override */
   .recharts-cartesian-axis-tick-value { font-family: "JetBrains Mono", monospace; }
+
+  /* === Green-glow interactive accent (dark theme only) === */
+  .kf-glow {
+    transition: border-color 220ms cubic-bezier(.22,.61,.36,1),
+                box-shadow   220ms cubic-bezier(.22,.61,.36,1),
+                background-color 220ms cubic-bezier(.22,.61,.36,1),
+                color        220ms cubic-bezier(.22,.61,.36,1);
+    position: relative;
+  }
+  .kf-dark .kf-glow {
+    border-color: oklch(0.85 0.18 165 / 0.22) !important;
+  }
+  .kf-dark .kf-glow:hover,
+  .kf-dark .kf-glow:focus-visible {
+    border-color: oklch(0.85 0.18 165 / 0.75) !important;
+    box-shadow: 0 0 0 1px oklch(0.85 0.18 165 / 0.35),
+                0 0 22px -4px oklch(0.85 0.18 165 / 0.55);
+    background-color: oklch(0.85 0.18 165 / 0.10) !important;
+  }
+  .kf-dark .kf-glow:active {
+    border-color: oklch(0.85 0.18 165 / 0.95) !important;
+    box-shadow: 0 0 0 1px oklch(0.85 0.18 165 / 0.5),
+                0 0 30px -2px oklch(0.85 0.18 165 / 0.75);
+    background-color: oklch(0.85 0.18 165 / 0.18) !important;
+    animation: kfClick 420ms cubic-bezier(.22,.61,.36,1);
+  }
+  @keyframes kfClick {
+    0%   { box-shadow: 0 0 0 0 oklch(0.85 0.18 165 / 0.7); transform: scale(1); }
+    35%  { box-shadow: 0 0 0 6px oklch(0.85 0.18 165 / 0.18); transform: scale(0.96); }
+    100% { box-shadow: 0 0 0 12px oklch(0.85 0.18 165 / 0); transform: scale(1); }
+  }
+
+  /* Text-only nav variant — for Loja, Ofertas, Biblioteca, Admin */
+  .kf-glow-text {
+    transition: color 220ms cubic-bezier(.22,.61,.36,1),
+                text-shadow 220ms cubic-bezier(.22,.61,.36,1);
+    position: relative;
+  }
+  .kf-glow-text::after {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+    width: 0;
+    height: 1px;
+    background: oklch(0.85 0.18 165);
+    transform: translateX(-50%);
+    transition: width 240ms cubic-bezier(.22,.61,.36,1), box-shadow 240ms;
+  }
+  .kf-dark .kf-glow-text:hover,
+  .kf-dark .kf-glow-text:focus-visible {
+    color: oklch(0.85 0.18 165) !important;
+    text-shadow: 0 0 14px oklch(0.85 0.18 165 / 0.45);
+  }
+  .kf-dark .kf-glow-text:hover::after,
+  .kf-dark .kf-glow-text:focus-visible::after {
+    width: 100%;
+    box-shadow: 0 0 8px oklch(0.85 0.18 165 / 0.7);
+  }
+  .kf-dark .kf-glow-text:active {
+    animation: kfTextClick 360ms cubic-bezier(.22,.61,.36,1);
+  }
+  @keyframes kfTextClick {
+    0%   { text-shadow: 0 0 0 oklch(0.85 0.18 165 / 0); }
+    40%  { text-shadow: 0 0 22px oklch(0.85 0.18 165 / 0.85); }
+    100% { text-shadow: 0 0 14px oklch(0.85 0.18 165 / 0.45); }
+  }
 </style>
 
 <!-- React 18 -->
@@ -62,8 +129,10 @@
   <script type="text/babel" data-presets="react" src="data.jsx"></script>
   <script type="text/babel" data-presets="react" src="i18n.jsx"></script>
   <script type="text/babel" data-presets="react" src="ui.jsx"></script>
+  <script type="text/babel" data-presets="react" src="bg.jsx"></script>
   <script type="text/babel" data-presets="react" src="storefront.jsx"></script>
   <script type="text/babel" data-presets="react" src="detail.jsx"></script>
+  <script type="text/babel" data-presets="react" src="admin-manage.jsx"></script>
   <script type="text/babel" data-presets="react" src="admin.jsx"></script>
   <script type="text/babel" data-presets="react" src="pages.jsx"></script>
   <script type="text/babel" data-presets="react" src="cart.jsx"></script>

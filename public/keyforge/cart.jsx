@@ -763,7 +763,7 @@ const CartButton = ({ onClick }) => {
   const count = cart?.count || 0;
   return (
     <button onClick={onClick}
-            className="relative w-8 h-8 rounded-lg flex items-center justify-center border transition"
+            className="kf-glow relative w-8 h-8 rounded-lg flex items-center justify-center border transition"
             style={{ background: theme === "light" ? tk.elevBg : "rgba(255,255,255,0.04)", borderColor: tk.borderSoft, color: tk.textMuted }}
             title={t("cart.title")}>
       <Icon name="ShoppingBag" size={14} />

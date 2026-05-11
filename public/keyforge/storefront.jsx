@@ -1,9 +1,9 @@
 // Storefront views: TopNav, Vitrine, GameCard
 const { useState: useStateSF, useEffect: useEffectSF, useMemo: useMemoSF } = React;
 
-// Reads the Next.js AuthContext payload that lives in localStorage under
-// "keyvault-auth". The KEYFORGE SPA itself is anonymous; admin gating just
-// looks for {role:"admin"} on that record.
+// Reads the Next.js AuthContext payload stored in localStorage("keyvault-auth")
+// so the SPA can gate admin-only nav items even though the prototype is purely
+// client-side.
 const readKeyvaultAuth = () => {
   try {
     const raw = typeof window !== "undefined" && localStorage.getItem("keyvault-auth");
@@ -59,10 +59,12 @@ const TopNav = ({ view, route, onNavigate, onCartClick }) => {
         <nav className="hidden md:flex items-center gap-6 font-mono text-[11px] tracking-[0.16em]">
           {navItems.map((it) => (
             <button key={it.key} onClick={() => onNavigate({ route: it.key })}
+                    className="kf-glow-text"
                     style={{ color: route === it.key ? tk.text : tk.textMuted }}>{it.label}</button>
           ))}
           {isAdmin && (
-            <button onClick={() => { window.location.href = "/admin"; }}
+            <button onClick={() => onNavigate({ route: "admin" })}
+                    className="kf-glow-text"
                     style={{ color: route === "admin" ? tk.accent : tk.textMuted }}>
               {t("nav.admin")}
             </button>
@@ -71,13 +73,13 @@ const TopNav = ({ view, route, onNavigate, onCartClick }) => {
 
         <div className="flex items-center gap-3">
           <button onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                  className="w-8 h-8 rounded-lg flex items-center justify-center border transition"
+                  className="kf-glow w-8 h-8 rounded-lg flex items-center justify-center border transition"
                   style={{ background: theme === "light" ? tk.elevBg : "rgba(255,255,255,0.04)", borderColor: tk.borderSoft }}
                   title={theme === "light" ? t("nav.themeToDark") : t("nav.themeToLight")}>
             <Icon name={theme === "light" ? "Moon" : "Sun"} size={14} color={tk.textMuted} />
           </button>
 
-          <button className="hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[12px]"
+          <button className="kf-glow hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[12px]"
                   style={{ background: theme === "light" ? tk.elevBg : "rgba(255,255,255,0.04)", borderColor: tk.borderSoft, color: tk.textMuted }}>
             <Icon name="Search" size={13} /> {t("nav.search")}
           </button>
@@ -86,19 +88,19 @@ const TopNav = ({ view, route, onNavigate, onCartClick }) => {
 
           {!authedUser ? (
             <a href="/login"
-               className="px-3.5 py-1.5 rounded-lg font-mono text-[11px] tracking-[0.16em] transition"
+               className="kf-glow px-3.5 py-1.5 rounded-lg font-mono text-[11px] tracking-[0.16em] transition"
                style={{
                  background: tk.accent,
                  color: theme === "light" ? "white" : "oklch(0.18 0.02 260)",
                  textDecoration: "none",
                  fontWeight: 600,
                }}>
-              {(language === "pt-BR" ? "ENTRAR" : "SIGN IN")}
+              {language === "pt-BR" ? "ENTRAR" : "SIGN IN"}
             </a>
           ) : (
           <div className="relative" ref={profileRef}>
             <button onClick={() => setProfileOpen((o) => !o)}
-                    className="w-8 h-8 rounded-full flex items-center justify-center border-2 transition relative"
+                    className="kf-glow w-8 h-8 rounded-full flex items-center justify-center border-2 transition relative"
                     style={{ background: "linear-gradient(135deg, oklch(0.85 0.18 165), oklch(0.65 0.16 220))",
                              borderColor: profileOpen ? tk.accent : "transparent" }}>
               <span className="font-display font-semibold text-[12px]" style={{ color: "oklch(0.18 0.02 260)" }}>
@@ -202,25 +204,36 @@ const TopNav = ({ view, route, onNavigate, onCartClick }) => {
                       { icon: "Library",  label: t("profile.library"),  href: "/library" },
                       { icon: "Receipt",  label: t("profile.orders"),   href: "/my-keys" },
                       ...(isAdmin
-                        ? [{ icon: "ShieldCheck", label: t("profile.admin"), href: "/admin" }]
+                        ? [{ icon: "ShieldCheck", label: t("profile.admin"), action: () => onNavigate({ route: "admin" }) }]
                         : []),
                     ].map((m) => (
-                      <a key={m.label}
-                         href={m.href}
-                         onClick={() => setProfileOpen(false)}
-                         className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition text-left"
-                         style={{ color: tk.text, textDecoration: "none" }}
-                         onMouseEnter={(e) => e.currentTarget.style.background = theme === "light" ? tk.elevBg : "rgba(255,255,255,0.05)"}
-                         onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
-                        <Icon name={m.icon} size={14} color={tk.textMuted} />
-                        <span className="font-display text-[13px]">{m.label}</span>
-                        {m.count != null && (
-                          <span className="ml-auto font-mono text-[10px] px-1.5 py-0.5 rounded"
-                                style={{ background: tk.accentBg, color: tk.accent }}>
-                            {m.count}
-                          </span>
-                        )}
-                      </a>
+                      m.href ? (
+                        <a key={m.label} href={m.href}
+                           onClick={() => setProfileOpen(false)}
+                           className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition text-left"
+                           style={{ color: tk.text, textDecoration: "none" }}
+                           onMouseEnter={(e) => e.currentTarget.style.background = theme === "light" ? tk.elevBg : "rgba(255,255,255,0.05)"}
+                           onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
+                          <Icon name={m.icon} size={14} color={tk.textMuted} />
+                          <span className="font-display text-[13px]">{m.label}</span>
+                          {m.count != null && (
+                            <span className="ml-auto font-mono text-[10px] px-1.5 py-0.5 rounded"
+                                  style={{ background: tk.accentBg, color: tk.accent }}>
+                              {m.count}
+                            </span>
+                          )}
+                        </a>
+                      ) : (
+                        <button key={m.label}
+                                onClick={() => { setProfileOpen(false); m.action && m.action(); }}
+                                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition text-left"
+                                style={{ color: tk.text }}
+                                onMouseEnter={(e) => e.currentTarget.style.background = theme === "light" ? tk.elevBg : "rgba(255,255,255,0.05)"}
+                                onMouseLeave={(e) => e.currentTarget.style.background = "transparent"}>
+                          <Icon name={m.icon} size={14} color={tk.textMuted} />
+                          <span className="font-display text-[13px]">{m.label}</span>
+                        </button>
+                      )
                     ))}
                   </div>
                   <div className="p-2 border-t" style={{ borderColor: tk.borderSoft }}>
@@ -232,11 +245,9 @@ const TopNav = ({ view, route, onNavigate, onCartClick }) => {
                         } catch {}
                         setAuthedUser(null);
                         setProfileOpen(false);
-                        // Hard reload so server-side context (cookies, etc) sync.
                         window.location.href = "/";
                       }}
-                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left"
-                      style={{ color: tk.warn }}>
+                      className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-left" style={{ color: tk.warn }}>
                       <Icon name="LogOut" size={14} />
                       <span className="font-display text-[13px]">{t("profile.signout")}</span>
                     </button>
@@ -644,25 +655,23 @@ const Vitrine = ({ onOpen }) => {
             </button>
           );
         })}
-        <div className="ml-auto flex items-center gap-3">
-          <div className="flex items-center gap-1 p-1 rounded-lg border" style={{ borderColor: tk.borderSoft, background: theme === "light" ? tk.elevBg : "rgba(255,255,255,0.04)" }}>
+        <div className="ml-auto flex items-center gap-2">
+          <div className="flex items-center gap-1 p-0.5 rounded-lg border" style={{ borderColor: tk.borderSoft, background: theme === "light" ? tk.elevBg : "rgba(255,255,255,0.04)" }}>
             <button onClick={() => setLayout("grid")}
-                    className="px-3.5 py-1.5 rounded-md font-mono text-[12px] tracking-wider flex items-center gap-2 transition"
+                    className="px-2.5 py-1 rounded-md font-mono text-[10px] tracking-wider flex items-center gap-1.5 transition"
                     style={{ background: layout === "grid" ? tk.accent : "transparent",
-                             color: layout === "grid" ? (theme === "light" ? "white" : "oklch(0.18 0.02 260)") : tk.textMuted,
-                             fontWeight: 600 }}>
-              <Icon name="LayoutGrid" size={14} /> {t("vitrine.viewGrid")}
+                             color: layout === "grid" ? (theme === "light" ? "white" : "oklch(0.18 0.02 260)") : tk.textMuted }}>
+              <Icon name="LayoutGrid" size={11} /> {t("vitrine.viewGrid")}
             </button>
             <button onClick={() => setLayout("list")}
-                    className="px-3.5 py-1.5 rounded-md font-mono text-[12px] tracking-wider flex items-center gap-2 transition"
+                    className="px-2.5 py-1 rounded-md font-mono text-[10px] tracking-wider flex items-center gap-1.5 transition"
                     style={{ background: layout === "list" ? tk.accent : "transparent",
-                             color: layout === "list" ? (theme === "light" ? "white" : "oklch(0.18 0.02 260)") : tk.textMuted,
-                             fontWeight: 600 }}>
-              <Icon name="List" size={14} /> {t("vitrine.viewList")}
+                             color: layout === "list" ? (theme === "light" ? "white" : "oklch(0.18 0.02 260)") : tk.textMuted }}>
+              <Icon name="List" size={11} /> {t("vitrine.viewList")}
             </button>
           </div>
-          <div className="flex items-center gap-2 font-mono text-[13px]" style={{ color: tk.textDim }}>
-            <Icon name="ArrowDownUp" size={14} /> {t("vitrine.sortBy")}
+          <div className="flex items-center gap-2 font-mono text-[11px]" style={{ color: tk.textDim }}>
+            <Icon name="ArrowDownUp" size={12} /> {t("vitrine.sortBy")}
           </div>
         </div>
       </div>
